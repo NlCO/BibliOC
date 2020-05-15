@@ -1,0 +1,11 @@
+language: java
+
+jdk:
+  - openjdk8
+
+addons:
+  sonarcloud:
+    organization: "nlco"
+
+script:
+  - mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.projectKey=NlCO_BibliOC

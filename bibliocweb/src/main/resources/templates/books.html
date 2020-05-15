@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" layout:decorate="~{layout.html}" xmlns="http://www.w3.org/1999/html"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Catalogue</title>
+    <link href="/webjars/bootstrap-table/1.15.5/bootstrap-table.css" rel="stylesheet">
+</head>
+<body>
+<main class="container-fluid w-75" layout:fragment="content">
+    <div class="h2 mt-5 border-bottom">Livres de la bibliothèque</div>
+    <table data-classes="table table-striped table-hover" data-locale="fr-FR" data-pagination="true"
+           data-search="true" data-show-extended-pagination="true" data-toggle="table">
+        <thead>
+        <tr>
+            <th data-align="center" data-halign="center" data-sortable="true">Titre</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Auteur</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Type</th>
+            <th data-align="center" data-halign="center">Disponibilité</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:utext="*{book.title}"></td>
+            <td th:utext="*{book.author}"></td>
+            <td th:text="*{book.type}"></td>
+            <td>
+                <div th:each="entry: *{book.getAvailabilityByLibrary()}">
+                    <span th:utext="${entry.key + ' : ' + entry.value}"></span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+
