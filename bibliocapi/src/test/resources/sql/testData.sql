@@ -4,6 +4,14 @@ INSERT INTO library (lib_name) VALUES ('Bib_A'),('Bib_B');
 
 INSERT INTO copy (book_book_id, location_id_library) VALUES (1,1),(2,1),(2,2),(3,1),(3,2),(5,1),(5,2),(5,2);
 
-INSERT INTO member (member_number, first_name, last_name, email, password) VALUES ('2020020801', 'xxxx', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'), ('2020020802', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'), ('2020020803', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'), ('2020020804', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C');
+INSERT INTO member (member_number, first_name, last_name, email, password) VALUES
+('2020020801', 'xxxx', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020802', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020803', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020804', 'xxxxy', 'xxxx', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020805', 'USER_TEST', 'RESERVATION', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020806', 'USER_TEST', 'RESERVATION', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020807', 'USER_TEST', 'RESERVATION', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C'),
+('2020020808', 'USER_TEST', 'RESERVATION', 'xxxx@xxxx.com', '$2a$10$F4ZTJ/zie.KtQjvmq.FZLeaVzbaVmzXCf1qZZQlX1UPvBBwXz1f.C');
 
 INSERT INTO loan (loan_date, extended_loan, copy_copy_id, member_member_id) VALUES ('2020-01-11 10:02:26','false',1,1),('2021-02-05 16:45:26','false',2,1),('2020-04-19 17:45:26','true',3,2),('2019-12-12 08:45:26','true',5,3);

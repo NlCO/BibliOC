@@ -36,6 +36,9 @@ public class Member implements Serializable {
     @OneToMany(mappedBy = "member")
     private List<Loan> loans;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Request> requests;
+
     public Member() {
     }
 }

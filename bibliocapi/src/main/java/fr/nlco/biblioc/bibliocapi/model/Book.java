@@ -32,6 +32,9 @@ public class Book implements Serializable {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Copy> copies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<Request> requests = new ArrayList<>();
+
     @Transient
     private Map<String, Long> availabilityByLibrary;
 
