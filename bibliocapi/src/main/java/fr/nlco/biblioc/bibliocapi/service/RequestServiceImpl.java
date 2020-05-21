@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * Implémentation de l'interface RequestService
@@ -35,13 +34,14 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request createRequest(RequestDto requestToCreate) {
         Book bookChecked = bookRepository.findById(requestToCreate.getBookId()).orElse(null);
-        Optional<Member> memberChecked = memberRepository.findByMemberNumber(requestToCreate.getMemberNumber());
-        if (bookChecked == null || !memberChecked.isPresent()) return null;
+        Member memberChecked = memberRepository.findByMemberNumber(requestToCreate.getMemberNumber()).orElse(null);
+        if (bookChecked == null || memberChecked == null) return null;
         if ((2 * bookChecked.getCopies().size() > bookChecked.getRequests().size())
-                && bookChecked.getCopies().stream().noneMatch(copy -> copy.getLoan() == null)) {
+                && bookChecked.getCopies().stream().noneMatch(copy -> copy.getLoan() == null)
+                && bookChecked.getCopies().stream().noneMatch(copy -> copy.getLoan().getMember().getMemberNumber().equals(memberChecked.getMemberNumber()))) {
             Request request = new Request();
             request.setBook(bookChecked);
-            request.setMember(memberChecked.get());
+            request.setMember(memberChecked);
             request.setRequestDate(new Date());
             return requestRepository.save(request);
         } else {
