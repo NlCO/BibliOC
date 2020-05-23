@@ -1,8 +1,11 @@
 package fr.nlco.biblioc.bibliocapi.service;
 
+import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.Request;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Interface contenant la logique metier des réservations
@@ -17,5 +20,13 @@ public interface RequestService {
      * @return la reservation
      */
     Request createRequest(RequestDto requestDto);
+
+    /**
+     * Methode permettant de lister la liste des réservation d'un memebre
+     *
+     * @param membre le membre
+     * @return la liste des réservations
+     */
+    List<MemberRequestDto> getMemberRequests(String membre);
 }
 

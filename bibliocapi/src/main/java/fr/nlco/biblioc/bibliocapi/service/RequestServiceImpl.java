@@ -1,16 +1,20 @@
 package fr.nlco.biblioc.bibliocapi.service;
 
+import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
+import fr.nlco.biblioc.bibliocapi.mapper.RequestMapper;
 import fr.nlco.biblioc.bibliocapi.model.Book;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import fr.nlco.biblioc.bibliocapi.model.Request;
 import fr.nlco.biblioc.bibliocapi.repository.BookRepository;
 import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
 import fr.nlco.biblioc.bibliocapi.repository.RequestRepository;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Implémentation de l'interface RequestService
@@ -18,12 +22,17 @@ import java.util.Date;
 @Service("RequestService")
 public class RequestServiceImpl implements RequestService {
 
+    private final RequestRepository requestRepository;
+    private final BookRepository bookRepository;
+    private final MemberRepository memberRepository;
+    private RequestMapper mapper = Mappers.getMapper(RequestMapper.class);
+
     @Autowired
-    RequestRepository requestRepository;
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    MemberRepository memberRepository;
+    public RequestServiceImpl(RequestRepository requestRepository, BookRepository bookRepository, MemberRepository memberRepository) {
+        this.requestRepository = requestRepository;
+        this.bookRepository = bookRepository;
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * Methode pour crée une réservation
@@ -47,5 +56,17 @@ public class RequestServiceImpl implements RequestService {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Methode permettant de lister la liste des réservation d'un memebre
+     *
+     * @param membre le membre
+     * @return la liste des réservations
+     */
+    @Override
+    public List<MemberRequestDto> getMemberRequests(String membre) {
+        Member memberChecked = memberRepository.findByMemberNumber(membre).orElse(null);
+        return mapper.requestsToMemberRequestDtos(requestRepository.findRequestsByMember(memberChecked));
     }
 }

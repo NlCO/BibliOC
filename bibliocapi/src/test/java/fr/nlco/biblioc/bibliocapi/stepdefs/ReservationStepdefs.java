@@ -1,5 +1,6 @@
 package fr.nlco.biblioc.bibliocapi.stepdefs;
 
+import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.Book;
 import fr.nlco.biblioc.bibliocapi.model.Copy;
@@ -40,12 +41,14 @@ public class ReservationStepdefs {
 
     private Book bookTest;
     private Request requestTest;
+    private List<MemberRequestDto> memberRequestDtoList;
 
     private Book createOneBookWithOneCopyLoaned(String emprunteur) {
         bookTest = createABookWithOneCopy();
         Loan loan = new Loan();
         loan.setMember(memberRepository.findByMemberNumber(emprunteur).orElseThrow(null));
         loan.setCopy(bookTest.getCopies().get(0));
+        loan.setLoanDate(new Date());
         loanRepository.save(loan);
 
         return bookRepository.findById(bookTest.getBookId()).orElseThrow(null);
@@ -54,6 +57,9 @@ public class ReservationStepdefs {
     private Book createABookWithOneCopy() {
         Book book = new Book();
         book.setIsbn(String.valueOf(System.currentTimeMillis()));
+        book.setTitle("TEST");
+        book.setAuthor("Cucumber");
+        book.setType("virtuel");
         Book newBook = bookRepository.save(book);
 
         Copy copy = new Copy();
@@ -135,5 +141,27 @@ public class ReservationStepdefs {
         Assert.assertEquals(bookTest.getCopies().get(0).getLoan().getMember().getMemberNumber(), emprunteur);
         Assert.assertEquals(bookTest.getRequests().get(0).getMember().getMemberNumber(), liste1);
         Assert.assertTrue(bookTest.getRequests().stream().noneMatch(request -> request.getMember().getMemberNumber().equals(emprunteur)));
+    }
+
+    @Given("le membre {} avec plusieurs réservations")
+    public void leMembreAvecPlusieursReservations(String membre) {
+        String emprunteur = "2020020805";
+        Assert.assertNotEquals(emprunteur, membre);
+        for (int i = 0; i < 3; i++) {
+            Book b = createOneBookWithOneCopyLoaned(emprunteur);
+            createARequest(b, membre);
+        }
+    }
+
+    @When("le membre {} consulte la liste de ses reservations")
+    public void leMembreConsulteLaListeDeSesReservations(String membre) {
+        memberRequestDtoList = requestService.getMemberRequests(membre);
+    }
+
+    @Then("un liste de plusieurs réservation du membre {} est retournée")
+    public void unListeDePlusieursReservationDuMembreEstRetournee(String membre) {
+        Assert.assertFalse(memberRequestDtoList.isEmpty());
+        long nbRequestForMembre = requestRepository.findAll().stream().filter(request -> request.getMember().getMemberNumber().equals(membre)).count();
+        Assert.assertEquals(nbRequestForMembre, memberRequestDtoList.size());
     }
 }

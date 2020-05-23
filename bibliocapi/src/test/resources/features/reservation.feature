@@ -24,3 +24,8 @@ Feature: reservation
     Given un livre indisponible emprunte par 2020020805 et reserver par 2020020806 uniquement
     When le membre 2020020805 le reserve
     Then le livre est toujours emprunte par 2020020805 reserve seulement par 2020020806 sans l'emprunteur
+
+  Scenario: liste de ses réservation
+    Given le membre 2020020808 avec plusieurs réservations
+    When le membre 2020020808 consulte la liste de ses reservations
+    Then un liste de plusieurs réservation du membre 2020020808 est retournée
