@@ -28,5 +28,12 @@ public interface RequestService {
      * @return la liste des réservations
      */
     List<MemberRequestDto> getMemberRequests(String membre);
+
+    /**
+     * Methode premttant d'annuler une reservation
+     *
+     * @param requestId l'id de la réservattion
+     */
+    void cancelRequest(Integer requestId);
 }
 

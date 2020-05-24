@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implémentation de l'interface RequestService
@@ -68,5 +69,16 @@ public class RequestServiceImpl implements RequestService {
     public List<MemberRequestDto> getMemberRequests(String membre) {
         Member memberChecked = memberRepository.findByMemberNumber(membre).orElse(null);
         return mapper.requestsToMemberRequestDtos(requestRepository.findRequestsByMember(memberChecked));
+    }
+
+    /**
+     * Methode premttant d'annuler une reservation
+     *
+     * @param requestId l'id de la réservattion
+     */
+    @Override
+    public void cancelRequest(Integer requestId) {
+        Optional<Request> request = requestRepository.findById(requestId);
+        request.ifPresent(requestRepository::delete);
     }
 }

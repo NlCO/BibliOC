@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -163,5 +164,22 @@ public class ReservationStepdefs {
         Assert.assertFalse(memberRequestDtoList.isEmpty());
         long nbRequestForMembre = requestRepository.findAll().stream().filter(request -> request.getMember().getMemberNumber().equals(membre)).count();
         Assert.assertEquals(nbRequestForMembre, memberRequestDtoList.size());
+    }
+
+    @When("le membre {} annule sa réservation")
+    public void leMembreAnnuleSaReservation(String membre) {
+        Integer requestId = bookTest.getRequests().stream()
+                .filter(r -> r.getMember().getMemberNumber().equals(membre))
+                .findFirst().orElseThrow(NoSuchElementException::new)
+                .getRequestId();
+        requestService.cancelRequest(requestId);
+    }
+
+    @Then("il ne reste plus que le membre {} et le {} n'est plus présent")
+    public void ilNeRestePlusQueLeMembreEtLeNEstPlusPresent(String membreRestant, String membreAnnulant) {
+        bookTest = bookRepository.findById(bookTest.getBookId()).orElseThrow(NoSuchElementException::new);
+        Assert.assertEquals(1, bookTest.getRequests().size());
+        Assert.assertTrue(bookTest.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(membreAnnulant)));
+        Assert.assertTrue(bookTest.getRequests().stream().allMatch(r -> r.getMember().getMemberNumber().equals(membreRestant)));
     }
 }

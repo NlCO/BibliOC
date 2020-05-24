@@ -29,3 +29,8 @@ Feature: reservation
     Given le membre 2020020808 avec plusieurs réservations
     When le membre 2020020808 consulte la liste de ses reservations
     Then un liste de plusieurs réservation du membre 2020020808 est retournée
+
+  Scenario: Annuler une réservation
+    Given un livre indisponible emprunte par 2020020805 avec les membres 2020020806 et 2020020807 sur liste d'attente
+    When le membre 2020020806 annule sa réservation
+    Then il ne reste plus que le membre 2020020807 et le 2020020806 n'est plus présent
