@@ -34,7 +34,7 @@ Au choix :
           
     - lancement du package généré dans le sous-répertoire target
      
-            java -jar target\bibliocapi-0.0.1-SNAPSHOT.war
+            java -jar target\bibliocapi-1.0.1-SNAPSHOT.war
 
 3.Accès
 
