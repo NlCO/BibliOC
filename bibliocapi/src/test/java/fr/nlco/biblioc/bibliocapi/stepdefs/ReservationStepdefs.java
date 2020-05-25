@@ -1,5 +1,6 @@
 package fr.nlco.biblioc.bibliocapi.stepdefs;
 
+import fr.nlco.biblioc.bibliocapi.controller.RequestController;
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.Book;
@@ -14,7 +15,10 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +27,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ReservationStepdefs {
+
+    @Autowired
+    RequestController requestController;
     @Autowired
     BookRepository bookRepository;
     @Autowired
@@ -41,8 +48,8 @@ public class ReservationStepdefs {
     RequestService requestService;
 
     private Book bookTest;
-    private Request requestTest;
-    private List<MemberRequestDto> memberRequestDtoList;
+    private ResponseEntity<Void> requestTest;
+    private ResponseEntity<List<MemberRequestDto>> responseMemberRequestDtoList;
 
     private Book createOneBookWithOneCopyLoaned(String emprunteur) {
         bookTest = createABookWithOneCopy();
@@ -89,7 +96,7 @@ public class ReservationStepdefs {
         RequestDto requestDto = new RequestDto();
         requestDto.setBookId(bookTest.getBookId());
         requestDto.setMemberNumber(member);
-        requestTest = requestService.createRequest(requestDto);
+        requestTest = requestController.createRequest(requestDto);
     }
 
     @Given("un livre indisponible emprunte par {} et reserver par {} uniquement")
@@ -99,8 +106,8 @@ public class ReservationStepdefs {
     }
 
     @Then("le membre {} est en position {int} sur la liste d'attente")
-    public void leMembreEstEnPositionSurLaListeDAttente(String membre, int position) {
-        Assert.assertNotNull(requestTest);
+    public void leMembreEstEnPositionSurLaListeDAttente(String membre, int position) throws URISyntaxException {
+        Assert.assertEquals(ResponseEntity.created(new URI("test")).build().getStatusCode(), requestTest.getStatusCode());
         Book book = bookRepository.findById(bookTest.getBookId()).orElseThrow(null);
         List<Request> requests = book.getRequests().stream().sorted(Comparator.comparing(Request::getRequestDate)).collect(Collectors.toList());
         Assert.assertEquals(membre, requests.get(position - 1).getMember().getMemberNumber());
@@ -117,7 +124,8 @@ public class ReservationStepdefs {
 
     @Then("la liste d'attente du livre est vide")
     public void laListeDAttenteDuLivreEstVide() {
-        Assert.assertNull(requestTest);
+        Assert.assertEquals(ResponseEntity.badRequest().build().getStatusCode(), requestTest.getStatusCode());
+        bookTest = bookRepository.findById(bookTest.getBookId()).orElseThrow(NoSuchElementException::new);
         Assert.assertTrue(bookTest.getRequests().isEmpty());
     }
 
@@ -130,7 +138,8 @@ public class ReservationStepdefs {
 
     @Then("le livre est toujours emprunte par {} reserve par {} et {} sans {} dans la liste")
     public void leLivreEstToujoursEmprunteParReserveParEtSansDansLaListe(String emprunteur, String liste1, String liste2, String liste3) {
-        Assert.assertNull(requestTest);
+        Assert.assertEquals(ResponseEntity.badRequest().build().getStatusCode(), requestTest.getStatusCode());
+        bookTest = bookRepository.findById(bookTest.getBookId()).orElseThrow(NoSuchElementException::new);
         Assert.assertEquals(bookTest.getCopies().get(0).getLoan().getMember().getMemberNumber(), emprunteur);
         Assert.assertTrue(bookTest.getRequests().stream().allMatch(request -> request.getMember().getMemberNumber().equals(liste1) || request.getMember().getMemberNumber().equals(liste2)));
         Assert.assertTrue(bookTest.getRequests().stream().noneMatch(request -> request.getMember().getMemberNumber().equals(liste3)));
@@ -138,7 +147,8 @@ public class ReservationStepdefs {
 
     @Then("le livre est toujours emprunte par {} reserve seulement par {} sans l'emprunteur")
     public void leLivreEstToujoursEmprunteParReserveSeulementParSansLEmprunteur(String emprunteur, String liste1) {
-        Assert.assertNull(requestTest);
+        Assert.assertEquals(ResponseEntity.badRequest().build().getStatusCode(), requestTest.getStatusCode());
+        bookTest = bookRepository.findById(bookTest.getBookId()).orElseThrow(NoSuchElementException::new);
         Assert.assertEquals(bookTest.getCopies().get(0).getLoan().getMember().getMemberNumber(), emprunteur);
         Assert.assertEquals(bookTest.getRequests().get(0).getMember().getMemberNumber(), liste1);
         Assert.assertTrue(bookTest.getRequests().stream().noneMatch(request -> request.getMember().getMemberNumber().equals(emprunteur)));
@@ -156,14 +166,14 @@ public class ReservationStepdefs {
 
     @When("le membre {} consulte la liste de ses reservations")
     public void leMembreConsulteLaListeDeSesReservations(String membre) {
-        memberRequestDtoList = requestService.getMemberRequests(membre);
+        responseMemberRequestDtoList = requestController.getMemberRequests(membre);
     }
 
     @Then("un liste de plusieurs réservation du membre {} est retournée")
     public void unListeDePlusieursReservationDuMembreEstRetournee(String membre) {
-        Assert.assertFalse(memberRequestDtoList.isEmpty());
+        Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), responseMemberRequestDtoList.getStatusCode());
         long nbRequestForMembre = requestRepository.findAll().stream().filter(request -> request.getMember().getMemberNumber().equals(membre)).count();
-        Assert.assertEquals(nbRequestForMembre, memberRequestDtoList.size());
+        Assert.assertEquals(nbRequestForMembre, responseMemberRequestDtoList.getBody().size());
     }
 
     @When("le membre {} annule sa réservation")
@@ -172,11 +182,12 @@ public class ReservationStepdefs {
                 .filter(r -> r.getMember().getMemberNumber().equals(membre))
                 .findFirst().orElseThrow(NoSuchElementException::new)
                 .getRequestId();
-        requestService.cancelRequest(requestId);
+        requestTest = requestController.cancelRequest(requestId);
     }
 
     @Then("il ne reste plus que le membre {} et le {} n'est plus présent")
     public void ilNeRestePlusQueLeMembreEtLeNEstPlusPresent(String membreRestant, String membreAnnulant) {
+        Assert.assertEquals(ResponseEntity.accepted().build().getStatusCode(), requestTest.getStatusCode());
         bookTest = bookRepository.findById(bookTest.getBookId()).orElseThrow(NoSuchElementException::new);
         Assert.assertEquals(1, bookTest.getRequests().size());
         Assert.assertTrue(bookTest.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(membreAnnulant)));

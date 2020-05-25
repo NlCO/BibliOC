@@ -1,6 +1,5 @@
 package fr.nlco.biblioc.bibliocapi.stepdefs;
 
-import fr.nlco.biblioc.bibliocapi.BibliocapiApplication;
 import fr.nlco.biblioc.bibliocapi.controller.BookController;
 import fr.nlco.biblioc.bibliocapi.controller.LoanController;
 import fr.nlco.biblioc.bibliocapi.dto.BookStockDto;
@@ -17,18 +16,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.security.InvalidParameterException;
 import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = BibliocapiApplication.class, loader = SpringBootContextLoader.class)
-@ActiveProfiles("test")
 public class BibliocStepdefs {
 
     @Autowired
