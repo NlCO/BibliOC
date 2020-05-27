@@ -25,8 +25,15 @@
             <td th:utext="*{book.author}"></td>
             <td th:text="*{book.type}"></td>
             <td>
-                <div th:each="entry: *{book.getAvailabilityByLibrary()}">
-                    <span th:utext="${entry.key + ' : ' + entry.value}"></span>
+                <div th:switch="*{book.getAvailabilityByLibrary().isEmpty()}">
+                    <div th:case="false">
+                        <div th:each="entry: *{book.getAvailabilityByLibrary()}">
+                            <span th:utext="${entry.key + ' : ' + entry.value}"></span>
+                        </div>
+                    </div>
+                    <div th:case="true">
+                        <a class="btn btn-dark rounded" role="button" th:href="@{|/book/${book.bookId}/request|}">Réserver</a>
+                    </div>
                 </div>
             </td>
         </tr>

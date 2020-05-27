@@ -12,6 +12,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class BookStockDto implements Serializable {
+    private Integer bookId;
     private String title;
     private String author;
     private String type;
