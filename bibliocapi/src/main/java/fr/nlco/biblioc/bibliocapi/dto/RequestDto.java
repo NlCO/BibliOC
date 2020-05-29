@@ -1,6 +1,7 @@
 package fr.nlco.biblioc.bibliocapi.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -10,10 +11,8 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class RequestDto implements Serializable {
     private Integer bookId;
     private String memberNumber;
-
-    public RequestDto() {
-    }
 }

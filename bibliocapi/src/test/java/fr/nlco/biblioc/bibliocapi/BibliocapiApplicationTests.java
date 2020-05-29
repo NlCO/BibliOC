@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = BibliocapiApplication.class, loader = SpringBootContextLoader.class)
 @ActiveProfiles("test")
-public class BibliocapiApplicationTests {
+class BibliocapiApplicationTests {
 
     @Test
     void contextLoads(@Autowired ConfigurableApplicationContext env) {

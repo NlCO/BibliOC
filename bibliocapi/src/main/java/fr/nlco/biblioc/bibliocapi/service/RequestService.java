@@ -40,6 +40,6 @@ public interface RequestService {
     /**
      * Methode pour envoyer un mail à la première personne de la liste
      */
-    void alertNextRequester(Book Book);
+    void alertNextRequester(Book book);
 }
 
