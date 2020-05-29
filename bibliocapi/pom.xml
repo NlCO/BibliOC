@@ -100,6 +100,12 @@
 		</dependency>
 		<!-- End of Swagger dependencies : for API documentation -->
 
+		<!-- Begin of mailing dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<!-- End of mailing dependencies -->
 	</dependencies>
 
 	<build>

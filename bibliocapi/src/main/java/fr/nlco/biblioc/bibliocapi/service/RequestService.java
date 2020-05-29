@@ -2,6 +2,7 @@ package fr.nlco.biblioc.bibliocapi.service;
 
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
+import fr.nlco.biblioc.bibliocapi.model.Book;
 import fr.nlco.biblioc.bibliocapi.model.Request;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,10 @@ public interface RequestService {
      * @param requestId l'id de la réservattion
      */
     void cancelRequest(Integer requestId);
+
+    /**
+     * Methode pour envoyer un mail à la première personne de la liste
+     */
+    void alertNextRequester(Book Book);
 }
 

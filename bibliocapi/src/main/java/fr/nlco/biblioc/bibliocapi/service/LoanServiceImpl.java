@@ -4,6 +4,7 @@ import fr.nlco.biblioc.bibliocapi.dto.LoanDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLateLoansDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLoansDto;
 import fr.nlco.biblioc.bibliocapi.mapper.LoansMapper;
+import fr.nlco.biblioc.bibliocapi.model.Book;
 import fr.nlco.biblioc.bibliocapi.model.Copy;
 import fr.nlco.biblioc.bibliocapi.model.Loan;
 import fr.nlco.biblioc.bibliocapi.model.Member;
@@ -23,16 +24,18 @@ import java.util.stream.Collectors;
 @Service("LoanService")
 public class LoanServiceImpl implements LoanService {
 
-    private final LoanRepository _LoanRepository;
-    private final MemberRepository _MemberRepository;
-    private final CopyRepository _CopyRepository;
+    private final LoanRepository loanRepository;
+    private final MemberRepository memberRepository;
+    private final CopyRepository copyRepository;
+    private final RequestService requestService;
     private LoansMapper mapper = Mappers.getMapper(LoansMapper.class);
 
     @Autowired
-    public LoanServiceImpl(LoanRepository loanRepository, MemberRepository memberRepository, CopyRepository copyRepository) {
-        this._LoanRepository = loanRepository;
-        this._MemberRepository = memberRepository;
-        this._CopyRepository = copyRepository;
+    public LoanServiceImpl(LoanRepository loanRepository, MemberRepository memberRepository, CopyRepository copyRepository, RequestService requestService) {
+        this.loanRepository = loanRepository;
+        this.memberRepository = memberRepository;
+        this.copyRepository = copyRepository;
+        this.requestService = requestService;
     }
 
     /**
@@ -43,8 +46,8 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public List<MemberLoansDto> getMemberLoans(String memberNumber) {
-        Member member = _MemberRepository.findByMemberNumber(memberNumber).orElse(null);
-        List<MemberLoansDto> memberLoans = mapper.loansToMemberLoansDtos(_LoanRepository.findLoansByMember(member));
+        Member member = memberRepository.findByMemberNumber(memberNumber).orElse(null);
+        List<MemberLoansDto> memberLoans = mapper.loansToMemberLoansDtos(loanRepository.findLoansByMember(member));
         memberLoans.forEach(l -> l.setDueDate(ComputeDueDate(l.getLoanDate(), l.getExtendedLoan())));
         return memberLoans;
     }
@@ -57,13 +60,13 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public Loan extendLoanPeriod(Integer loanId) {
-        Optional<Loan> loan = _LoanRepository.findById(loanId);
+        Optional<Loan> loan = loanRepository.findById(loanId);
         if (loan.isPresent()) {
             loan.get().setExtendedLoan(true);
         } else {
             return null;
         }
-        return _LoanRepository.save(loan.get());
+        return loanRepository.save(loan.get());
     }
 
     /**
@@ -73,7 +76,7 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public List<MemberLateLoansDto> getLateLoans() {
-        List<Member> members = _MemberRepository.findAll();
+        List<Member> members = memberRepository.findAll();
         List<Member> membersWithLoans = members.stream().filter(m -> m.getLoans().size() > 0).collect(Collectors.toList());
         Date today = new Date();
         List<MemberLateLoansDto> lateLoans = new ArrayList<>();
@@ -94,16 +97,16 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public Loan createLoan(LoanDto loanToCreate) {
-        Copy copyChecked = _CopyRepository.findById(loanToCreate.getCopyId()).orElse(null);
-        Optional<Member> memberChecked = _MemberRepository.findByMemberNumber(loanToCreate.getMemberNumber());
+        Copy copyChecked = copyRepository.findById(loanToCreate.getCopyId()).orElse(null);
+        Optional<Member> memberChecked = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber());
         if (copyChecked == null || !memberChecked.isPresent()) return null;
-        Optional<Loan> loanCheck = _LoanRepository.findByCopy(copyChecked);
+        Optional<Loan> loanCheck = loanRepository.findByCopy(copyChecked);
         if (loanCheck.isPresent()) return null;
         Loan loan = new Loan();
         loan.setCopy(copyChecked);
         loan.setMember(memberChecked.get());
         loan.setLoanDate(new Date());
-        return _LoanRepository.save(loan);
+        return loanRepository.save(loan);
     }
 
     /**
@@ -113,8 +116,12 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public void returnLoan(Integer loanId) {
-        Optional<Loan> loan = _LoanRepository.findById(loanId);
-        loan.ifPresent(_LoanRepository::delete);
+        Optional<Loan> loan = loanRepository.findById(loanId);
+        if (loan.isPresent()) {
+            Book book = loan.get().getCopy().getBook();
+            loanRepository.delete(loan.get());
+            requestService.alertNextRequester(book);
+        }
     }
 
     /**

@@ -3,28 +3,33 @@ package fr.nlco.biblioc.bibliocapi.stepdefs;
 import fr.nlco.biblioc.bibliocapi.controller.RequestController;
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
-import fr.nlco.biblioc.bibliocapi.model.Book;
-import fr.nlco.biblioc.bibliocapi.model.Copy;
-import fr.nlco.biblioc.bibliocapi.model.Loan;
-import fr.nlco.biblioc.bibliocapi.model.Request;
+import fr.nlco.biblioc.bibliocapi.model.*;
 import fr.nlco.biblioc.bibliocapi.repository.*;
 import fr.nlco.biblioc.bibliocapi.service.LoanService;
+import fr.nlco.biblioc.bibliocapi.service.LoanServiceImpl;
 import fr.nlco.biblioc.bibliocapi.service.RequestService;
+import fr.nlco.biblioc.bibliocapi.service.RequestServiceImpl;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.security.InvalidParameterException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class ReservationStepdefs {
 
@@ -46,10 +51,14 @@ public class ReservationStepdefs {
     LoanService loanService;
     @Autowired
     RequestService requestService;
+    @Spy
+    @Autowired
+    JavaMailSender mailSender;
 
     private Book bookTest;
     private ResponseEntity<Void> requestTest;
     private ResponseEntity<List<MemberRequestDto>> responseMemberRequestDtoList;
+    private ArgumentCaptor<SimpleMailMessage> email = ArgumentCaptor.forClass(SimpleMailMessage.class);
 
     private Book createOneBookWithOneCopyLoaned(String emprunteur) {
         bookTest = createABookWithOneCopy();
@@ -192,5 +201,21 @@ public class ReservationStepdefs {
         Assert.assertEquals(1, bookTest.getRequests().size());
         Assert.assertTrue(bookTest.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(membreAnnulant)));
         Assert.assertTrue(bookTest.getRequests().stream().allMatch(r -> r.getMember().getMemberNumber().equals(membreRestant)));
+    }
+
+    @When("le livre est rendu à la bilbiothèque")
+    public void leLivreEstRenduALaBilbiotheque() throws MailSendException {
+        JavaMailSender spiedMailSender = spy(mailSender);
+        RequestService spiedRequestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, spiedMailSender);
+        LoanService spiedLoanService = new LoanServiceImpl(loanRepository, memberRepository, copyRepository, spiedRequestService);
+        doNothing().when(spiedMailSender).send(any(SimpleMailMessage.class));
+        spiedLoanService.returnLoan(bookTest.getCopies().get(0).getLoan().getLoanId());
+        verify(spiedMailSender).send(email.capture());
+    }
+
+    @Then("un mail est envoyé au membre {} pour l'avertir")
+    public void unMailEstEnvoyeAuMembrePourLAvertir(String membre) {
+        Member member = memberRepository.findByMemberNumber(membre).orElseThrow(InvalidParameterException::new);
+        Assert.assertEquals(member.getEmail(), Objects.requireNonNull(email.getValue().getTo())[0]);
     }
 }

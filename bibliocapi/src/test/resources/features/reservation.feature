@@ -34,3 +34,8 @@ Feature: reservation
     Given un livre indisponible emprunte par 2020020805 avec les membres 2020020806 et 2020020807 sur liste d'attente
     When le membre 2020020806 annule sa réservation
     Then il ne reste plus que le membre 2020020807 et le 2020020806 n'est plus présent
+
+  Scenario: Alerte suite à un retour
+    Given un livre indisponible emprunte par 2020020805 avec les membres 2020020806 et 2020020807 sur liste d'attente
+    When le livre est rendu à la bilbiothèque
+    Then un mail est envoyé au membre 2020020806 pour l'avertir
