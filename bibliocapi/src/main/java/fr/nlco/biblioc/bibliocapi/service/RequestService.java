@@ -41,5 +41,10 @@ public interface RequestService {
      * Methode pour envoyer un mail à la première personne de la liste
      */
     void alertNextRequester(Book book);
+
+    /**
+     * Permet de mettre à jour la liste d'attente des ouvrage de la bibliothèque
+     */
+    void refreshBookRequests();
 }
 

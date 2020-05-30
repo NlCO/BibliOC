@@ -24,6 +24,9 @@ public class Request implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date requestDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date alertDate;
+
     @ManyToOne
     private Book book;
 

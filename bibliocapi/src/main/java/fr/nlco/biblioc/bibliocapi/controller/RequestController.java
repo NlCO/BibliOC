@@ -73,4 +73,17 @@ public class RequestController {
         }
         return ResponseEntity.accepted().build();
     }
+
+    /**
+     * Refresh des réservations
+     */
+    @GetMapping("/request/refresh")
+    public ResponseEntity<Void> refreshRequests() {
+        try {
+            requestService.refreshBookRequests();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.accepted().build();
+    }
 }

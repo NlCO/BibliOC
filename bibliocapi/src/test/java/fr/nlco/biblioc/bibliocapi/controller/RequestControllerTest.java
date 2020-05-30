@@ -36,4 +36,16 @@ class RequestControllerTest {
         //Assert
         assertEquals(ResponseEntity.badRequest().build().getStatusCode(), response.getStatusCode());
     }
+
+    @Test
+    void refreshRequest_ReturnBadRequest_WhenRefreshRequestFail() {
+        //Arrange
+        doThrow(NullPointerException.class).when(requestService).refreshBookRequests();
+
+        //Act
+        ResponseEntity<Void> response = requestController.refreshRequests();
+
+        //Assert
+        assertEquals(ResponseEntity.badRequest().build().getStatusCode(), response.getStatusCode());
+    }
 }

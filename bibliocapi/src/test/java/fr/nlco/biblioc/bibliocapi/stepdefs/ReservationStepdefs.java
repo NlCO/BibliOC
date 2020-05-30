@@ -218,4 +218,22 @@ public class ReservationStepdefs {
         Member member = memberRepository.findByMemberNumber(membre).orElseThrow(InvalidParameterException::new);
         Assert.assertEquals(member.getEmail(), Objects.requireNonNull(email.getValue().getTo())[0]);
     }
+
+    @Given("Un service de batch appelant")
+    public void unServiceDeBatchAppelant() {
+        JavaMailSender spiedMailSender = spy(mailSender);
+        RequestService spiedRequestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, spiedMailSender);
+        doNothing().when(spiedMailSender).send(any(SimpleMailMessage.class));
+        requestController = new RequestController(spiedRequestService);
+    }
+
+    @When("il demande de mettre à jour les réservations")
+    public void ilDemandeDeMettreÀJourLesRéservations() {
+        requestTest = requestController.refreshRequests();
+    }
+
+    @Then("la mise à jour a été effectuée")
+    public void laMiseÀJourAÉtéEffectuée() {
+        Assert.assertEquals(ResponseEntity.accepted().build().getStatusCode(), requestTest.getStatusCode());
+    }
 }

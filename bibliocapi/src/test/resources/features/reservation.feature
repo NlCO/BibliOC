@@ -39,3 +39,8 @@ Feature: reservation
     Given un livre indisponible emprunte par 2020020805 avec les membres 2020020806 et 2020020807 sur liste d'attente
     When le livre est rendu à la bilbiothèque
     Then un mail est envoyé au membre 2020020806 pour l'avertir
+
+  Scenario: Refresh des reservations
+    Given Un service de batch appelant
+    When il demande de mettre à jour les réservations
+    Then la mise à jour a été effectuée

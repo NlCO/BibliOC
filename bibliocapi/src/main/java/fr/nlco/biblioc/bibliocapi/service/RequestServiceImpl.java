@@ -15,10 +15,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * Implémentation de l'interface RequestService
@@ -84,7 +83,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public void cancelRequest(Integer requestId) {
         Optional<Request> request = requestRepository.findById(requestId);
-        request.ifPresent(requestRepository::delete);
+        if (request.isPresent()) {
+            requestRepository.delete(request.get());
+            if (request.get().getAlertDate() != null) {
+                Integer bookId = request.get().getBook().getBookId();
+                alertNextRequester(Objects.requireNonNull(bookRepository.findById(bookId).orElse(null)));
+            }
+        }
     }
 
     /**
@@ -93,7 +98,21 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public void alertNextRequester(Book book) {
         Optional<Request> request = book.getRequests().stream().min(Comparator.comparing(Request::getRequestDate));
-        request.ifPresent(this::sendMailToMember);
+        if (request.isPresent()) {
+            request.get().setAlertDate(new Date());
+            sendMailToMember(request.get());
+        }
+    }
+
+    /**
+     * Permet de mettre à jour la liste d'attente des ouvrage de la bibliothèque
+     */
+    @Override
+    public void refreshBookRequests() {
+        bookRepository.findAll().stream()
+                .filter(this::isFirstRequestOutdated)
+                .map(this::getOnGoingBookRequest)
+                .forEach(r -> cancelRequest(r.getRequestId()));
     }
 
     /**
@@ -114,5 +133,23 @@ public class RequestServiceImpl implements RequestService {
         email.setSubject("[BILIOC] - Réservation disponible");
         email.setText(body.toString());
         mailSender.send(email);
+    }
+
+    private boolean isFirstRequestOutdated(Book book) {
+        return book.getRequests().stream()
+                .filter(r -> r.getAlertDate() != null).findFirst()
+                .map(request -> isOutdated(request.getAlertDate())).orElse(false);
+    }
+
+    private boolean isOutdated(Date date) {
+        LocalDate today = LocalDate.now();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.HOUR, 48);
+        return today.isAfter(c.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+    }
+
+    private Request getOnGoingBookRequest(Book book) {
+        return book.getRequests().stream().filter(r -> r.getAlertDate() != null).findFirst().orElse(null);
     }
 }

@@ -1,6 +1,6 @@
 package fr.nlco.biblioc.bibliocbatch.steps;
 
-import fr.nlco.biblioc.bibliocbatch.service.ReminderService;
+import fr.nlco.biblioc.bibliocbatch.proxies.BibliocapiProxy;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component;
  * Tasklet décrivant la task à réaliser
  */
 @Component
-public class MembersLateLoansTasklet implements Tasklet {
+public class RefreshBooksRequestsTasklet implements Tasklet {
 
-    private final ReminderService reminderService;
+    private final BibliocapiProxy bibliocapiProxy;
 
     @Autowired
-    public MembersLateLoansTasklet(ReminderService reminderService) {
-        this.reminderService = reminderService;
+    public RefreshBooksRequestsTasklet(BibliocapiProxy bibliocapiProxy) {
+        this.bibliocapiProxy = bibliocapiProxy;
     }
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        reminderService.sendReminderMails();
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
+        bibliocapiProxy.refreshRequests();
         return RepeatStatus.FINISHED;
     }
 }

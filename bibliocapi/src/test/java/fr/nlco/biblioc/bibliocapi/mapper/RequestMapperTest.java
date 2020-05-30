@@ -27,7 +27,7 @@ class RequestMapperTest {
         book.setType("T");
         Copy copy = new Copy();
         Loan loan = new Loan();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YY");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
         loan.setLoanDate(formatter.parse("23/05/2020"));
         copy.setLoan(loan);
         book.getCopies().add(copy);
