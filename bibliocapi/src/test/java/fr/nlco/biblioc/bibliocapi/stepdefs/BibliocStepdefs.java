@@ -24,17 +24,17 @@ import java.util.List;
 public class BibliocStepdefs {
 
     @Autowired
-    private BookRepository _BookRepository;
+    private BookRepository bookRepository;
     @Autowired
-    private CopyRepository _CopyRepository;
+    private CopyRepository copyRepository;
     @Autowired
-    private BookController _BookController;
+    private BookController bookController;
     @Autowired
-    private MemberRepository _MemberRepository;
+    private MemberRepository memberRepository;
     @Autowired
-    private LoanController _LoanController;
+    private LoanController loanController;
     @Autowired
-    private LoanRepository _LoanRepository;
+    private LoanRepository loanRepository;
 
     private Integer bookNumber = 0;
     private Integer copyNumber = 0;
@@ -51,35 +51,37 @@ public class BibliocStepdefs {
 
     @Given("a library with n copies of y books")
     public void aLibraryWithBooksFromYWorks() {
-        copyNumber = _CopyRepository.findAll().size();
-        bookNumber = _BookRepository.findAll().size();
+        copyNumber = copyRepository.findAll().size();
+        bookNumber = bookRepository.findAll().size();
         Assert.assertTrue("La base de données ne contient pas d'ouvrages", bookNumber > 0);
         Assert.assertTrue("La base de données ne contient pas de livres", copyNumber > 0);
     }
 
-    @When("I ask the list of books")
-    public void iAskTheListOfBooks() {
-        booksStocks = _BookController.getBooksStock();
+    @When("The memnber {} ask the list of books")
+    public void iAskTheListOfBooks(String memberNumber) {
+        booksStocks = bookController.getBooksStock(memberNumber);
     }
 
     @Then("a list of y books with their availability is returned")
     public void aListOfBooksWithTheirAvailabilityIsReturned() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), booksStocks.getStatusCode());
-        Integer nbBookResult = booksStocks.getBody().size();
+        List<BookStockDto> bookStocks = booksStocks.getBody();
+        Assert.assertNotNull(bookStocks);
+        Integer nbBookResult = bookStocks.size();
         Assert.assertEquals(bookNumber, nbBookResult);
-        Integer nbCopyResult = booksStocks.getBody().stream().mapToInt(BookStockDto::getNbCopy).sum();
+        Integer nbCopyResult = bookStocks.stream().mapToInt(BookStockDto::getNbCopy).sum();
         Assert.assertEquals(copyNumber, nbCopyResult);
     }
 
     @Given("the member {} with loaned books")
     public void aMemberWithLoanedBooks(String memberNumber) {
-        member = _MemberRepository.findByMemberNumber(memberNumber).orElseThrow(() -> new InvalidParameterException("numéro de membre inexistant"));
+        member = memberRepository.findByMemberNumber(memberNumber).orElseThrow(() -> new InvalidParameterException("numéro de membre inexistant"));
         Assert.assertTrue(member.getLoans().size() > 0);
     }
 
     @When("he consult his loans")
     public void heConsultHisLoaning() {
-        memberLoans = _LoanController.getMemberLoans(member.getMemberNumber());
+        memberLoans = loanController.getMemberLoans(member.getMemberNumber());
     }
 
     @Then("a list of his loaned book is returned")
@@ -90,31 +92,31 @@ public class BibliocStepdefs {
 
     @Given("a loaned book which due date is not extended")
     public void aLoanedBookWhichDueDateIsNotExtended() {
-        loan = _LoanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
+        loan = loanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
         Assert.assertFalse(loan.isExtendedLoan());
     }
 
     @When("the loan period is extended")
     public void theLoanPeriodIsExtended() {
-        extendLoanResponse = _LoanController.extendLoanPeriod(loan.getLoanId());
+        extendLoanResponse = loanController.extendLoanPeriod(loan.getLoanId());
     }
 
     @Then("the book is flagged with the extend loaning period")
     public void theBookIsFlaggedWithTheExtendLoaningPeriod() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), extendLoanResponse.getStatusCode());
-        loan = _LoanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
+        loan = loanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
         Assert.assertTrue(loan.isExtendedLoan());
     }
 
     @Given("a list of {int} members in the database")
     public void membersWhichHaveLateLoans(int members) {
-        List<Member> allMembers = _MemberRepository.findAll();
+        List<Member> allMembers = memberRepository.findAll();
         Assert.assertTrue(allMembers.size() > 0);
     }
 
     @When("the batch look for late loans of member")
     public void theBatchLookForLateLoansOfMember() {
-        responseEntityMemberlateloans = _LoanController.getLateLoans();
+        responseEntityMemberlateloans = loanController.getLateLoans();
     }
 
     @Then("a list of {int} member is return")

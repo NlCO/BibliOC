@@ -34,7 +34,7 @@ public class CatalogController {
      */
     @GetMapping("/books")
     public String getBooks(Model model) {
-        List<Book> books = bibliocapiProxy.getBooks();
+        List<Book> books = bibliocapiProxy.getBooks(SecurityContextHolder.getContext().getAuthentication().getName());
         model.addAttribute("books", books);
         return "books";
     }

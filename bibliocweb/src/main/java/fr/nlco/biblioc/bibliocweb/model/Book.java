@@ -1,9 +1,11 @@
 package fr.nlco.biblioc.bibliocweb.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -11,6 +13,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class Book implements Serializable {
     private Integer bookId;
     private String title;
@@ -19,7 +22,7 @@ public class Book implements Serializable {
     private Integer nbCopy;
     private Integer nbAvailable;
     private Map<String, Long> availabilityByLibrary;
-
-    public Book() {
-    }
+    private Integer nbRequested;
+    private boolean resquestable;
+    private Date nextReturnDate;
 }

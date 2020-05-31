@@ -18,8 +18,8 @@ public interface BibliocapiProxy {
      *
      * @return la liste des livres
      */
-    @GetMapping("/books")
-    List<Book> getBooks();
+    @GetMapping("/books/{memberNumber}")
+    List<Book> getBooks(@PathVariable("memberNumber") String memberNumber);
 
     /**
      * Récupération de la liste des emprunts d'un usager

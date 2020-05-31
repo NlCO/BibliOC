@@ -228,12 +228,12 @@ public class ReservationStepdefs {
     }
 
     @When("il demande de mettre à jour les réservations")
-    public void ilDemandeDeMettreÀJourLesRéservations() {
+    public void ilDemandeDeMettreAJourLesReservations() {
         requestTest = requestController.refreshRequests();
     }
 
     @Then("la mise à jour a été effectuée")
-    public void laMiseÀJourAÉtéEffectuée() {
+    public void laMiseAJourAEteEffectuee() {
         Assert.assertEquals(ResponseEntity.accepted().build().getStatusCode(), requestTest.getStatusCode());
     }
 }

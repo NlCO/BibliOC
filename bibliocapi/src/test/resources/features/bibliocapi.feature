@@ -2,7 +2,7 @@ Feature: BiblioOCapi
 
   Scenario: Get list of books and their availability
     Given a library with n copies of y books
-    When I ask the list of books
+    When The memnber 2020020802 ask the list of books
     Then a list of y books with their availability is returned
 
   Scenario: Get member's loaned books
