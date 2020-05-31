@@ -16,6 +16,7 @@
             <th data-align="center" data-halign="center" data-sortable="true">Titre</th>
             <th data-align="center" data-halign="center" data-sortable="true">Auteur</th>
             <th data-align="center" data-halign="center" data-sortable="true">Type</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Position fil d'attente</th>
             <th data-align="center" data-field="dueDate" data-halign="center" data-sortable="true">Date de retour</th>
             <th data-align="center" data-halign="center"></th>
         </tr>
@@ -25,6 +26,7 @@
             <td th:utext="*{request.title}"></td>
             <td th:utext="*{request.author}"></td>
             <td th:utext="*{request.type}"></td>
+            <td th:utext="*{request.rank}"></td>
             <td th:text="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></td>
             <td><a class="btn btn-dark rounded" role="button" th:href="@{'/request/' + ${request.requestId} + '/annulation'}">Annuler</a>
             </td>

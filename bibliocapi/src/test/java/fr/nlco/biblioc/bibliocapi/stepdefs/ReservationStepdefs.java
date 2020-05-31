@@ -24,9 +24,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -115,13 +116,12 @@ public class ReservationStepdefs {
     }
 
     @Then("le membre {} est en position {int} sur la liste d'attente")
-    public void leMembreEstEnPositionSurLaListeDAttente(String membre, int position) throws URISyntaxException {
+    public void leMembreEstEnPositionSurLaListeDAttente(String membre, Integer position) throws URISyntaxException {
         Assert.assertEquals(ResponseEntity.created(new URI("test")).build().getStatusCode(), requestTest.getStatusCode());
         Book book = bookRepository.findById(bookTest.getBookId()).orElseThrow(null);
-        List<Request> requests = book.getRequests().stream().sorted(Comparator.comparing(Request::getRequestDate)).collect(Collectors.toList());
-        Assert.assertEquals(membre, requests.get(position - 1).getMember().getMemberNumber());
-        int place = IntStream.range(0, requests.size()).filter(i -> requests.get(i).getMember().getMemberNumber().equals(membre)).findFirst().orElse(-1);
-        Assert.assertEquals(position, place + 1);
+        Request requestToChecked = book.getRequests().get(position - 1);
+        Assert.assertEquals(membre, requestToChecked.getMember().getMemberNumber());
+        Assert.assertEquals(position, requestToChecked.getRank());
     }
 
     @Given("un livre encore disponible et sans file d'attente")

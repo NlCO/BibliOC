@@ -135,12 +135,24 @@ public class RequestServiceImpl implements RequestService {
         mailSender.send(email);
     }
 
+    /**
+     * Retourne vrai si la réservation en cours d'un ouvrage est dépassée
+     *
+     * @param book l'ovrage
+     * @return booléen
+     */
     private boolean isFirstRequestOutdated(Book book) {
         return book.getRequests().stream()
                 .filter(r -> r.getAlertDate() != null).findFirst()
                 .map(request -> isOutdated(request.getAlertDate())).orElse(false);
     }
 
+    /**
+     * Calcul si la date est dépassé de 48h
+     *
+     * @param date date
+     * @return vrai ou faux
+     */
     private boolean isOutdated(Date date) {
         LocalDate today = LocalDate.now();
         Calendar c = Calendar.getInstance();
@@ -149,6 +161,12 @@ public class RequestServiceImpl implements RequestService {
         return today.isAfter(c.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
+    /**
+     * Retourn la résevation en cours pour un livre
+     *
+     * @param book livre
+     * @return la réservations
+     */
     private Request getOnGoingBookRequest(Book book) {
         return book.getRequests().stream().filter(r -> r.getAlertDate() != null).findFirst().orElse(null);
     }

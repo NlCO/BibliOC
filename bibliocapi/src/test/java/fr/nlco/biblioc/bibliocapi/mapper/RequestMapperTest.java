@@ -1,10 +1,7 @@
 package fr.nlco.biblioc.bibliocapi.mapper;
 
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
-import fr.nlco.biblioc.bibliocapi.model.Book;
-import fr.nlco.biblioc.bibliocapi.model.Copy;
-import fr.nlco.biblioc.bibliocapi.model.Loan;
-import fr.nlco.biblioc.bibliocapi.model.Request;
+import fr.nlco.biblioc.bibliocapi.model.*;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -34,6 +31,7 @@ class RequestMapperTest {
         Request request = new Request();
         request.setRequestId(1);
         request.setBook(book);
+        request.setMember(new Member());
         MemberRequestDto expected = new MemberRequestDto();
         expected.setRequestId(1);
         expected.setTitle(book.getTitle());
@@ -43,6 +41,7 @@ class RequestMapperTest {
         c.setTime(loan.getLoanDate());
         c.add(Calendar.WEEK_OF_MONTH, 4);
         expected.setReturnFirstDate(c.getTime());
+        expected.setRank(0);
 
         //Act
         MemberRequestDto result = mapper.requestToMemberRequestDto(request);
@@ -52,6 +51,7 @@ class RequestMapperTest {
         assertEquals(expected.getTitle(), result.getTitle());
         assertEquals(expected.getAuthor(), result.getAuthor());
         assertEquals(expected.getType(), result.getType());
-        assertEquals(result.getReturnFirstDate(), result.getReturnFirstDate());
+        assertEquals(expected.getReturnFirstDate(), result.getReturnFirstDate());
+        assertEquals(expected.getRank(), result.getRank());
     }
 }

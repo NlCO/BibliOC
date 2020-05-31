@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * Classe model représentant les réservations
@@ -32,4 +34,15 @@ public class Request implements Serializable {
 
     @ManyToOne
     private Member member;
+
+    @Transient
+    private Integer rank;
+
+    public Integer getRank() {
+        return 1 + book.getRequests().stream()
+                .sorted(Comparator.comparing(Request::getRequestDate))
+                .map(request -> request.getMember().getMemberNumber())
+                .collect(Collectors.toList())
+                .indexOf(member.getMemberNumber());
+    }
 }
