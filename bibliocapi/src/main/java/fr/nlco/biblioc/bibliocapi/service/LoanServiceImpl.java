@@ -4,10 +4,7 @@ import fr.nlco.biblioc.bibliocapi.dto.LoanDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLateLoansDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLoansDto;
 import fr.nlco.biblioc.bibliocapi.mapper.LoansMapper;
-import fr.nlco.biblioc.bibliocapi.model.Book;
-import fr.nlco.biblioc.bibliocapi.model.Copy;
-import fr.nlco.biblioc.bibliocapi.model.Loan;
-import fr.nlco.biblioc.bibliocapi.model.Member;
+import fr.nlco.biblioc.bibliocapi.model.*;
 import fr.nlco.biblioc.bibliocapi.repository.CopyRepository;
 import fr.nlco.biblioc.bibliocapi.repository.LoanRepository;
 import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
@@ -97,16 +94,36 @@ public class LoanServiceImpl implements LoanService {
      */
     @Override
     public Loan createLoan(LoanDto loanToCreate) {
-        Copy copyChecked = copyRepository.findById(loanToCreate.getCopyId()).orElse(null);
-        Optional<Member> memberChecked = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber());
-        if (copyChecked == null || !memberChecked.isPresent()) return null;
-        Optional<Loan> loanCheck = loanRepository.findByCopy(copyChecked);
-        if (loanCheck.isPresent()) return null;
-        Loan loan = new Loan();
-        loan.setCopy(copyChecked);
-        loan.setMember(memberChecked.get());
-        loan.setLoanDate(new Date());
-        return loanRepository.save(loan);
+        //Copy copyChecked = copyRepository.findById(loanToCreate.getCopyId()).orElse(null);
+        //Optional<Member> memberChecked = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber());
+        //if (copyChecked == null || !memberChecked.isPresent()) return null;
+        //Optional<Loan> loanCheck = loanRepository.findByCopy(copyChecked);
+
+        Copy copy = copyRepository.findById(loanToCreate.getCopyId()).orElseThrow(IllegalArgumentException::new);
+        Member loaner = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber()).orElseThrow(IllegalArgumentException::new);
+        Loan loan = null;
+        if (copy.getLoan() == null && isLoanerNextInQueueOrEmptyQueue(copy.getBook(), loaner.getMemberNumber())) {
+            loan = new Loan();
+            loan.setCopy(copy);
+            loan.setMember(loaner);
+            loan.setLoanDate(new Date());
+            //loan = loanRepository.save(loan);
+            //loan = loanRepository.saveAndFlush(loan);
+            //if (loanRepository.existsById(loan.getLoanId())) {
+            if (!copy.getBook().getRequests().isEmpty()) {
+                requestService.cancelRequest(getRequestIdFromBookAndMember(copy.getBook()));
+            }
+            return loanRepository.save(loan);
+            //}
+        }
+        return null;
+
+        //if (loanCheck.isPresent()) return null;
+        //Loan loan = new Loan();
+        //loan.setCopy(copyChecked);
+        //loan.setMember(memberChecked.get());
+        //loan.setLoanDate(new Date());
+        //return loanRepository.save(loan);
     }
 
     /**
@@ -136,5 +153,36 @@ public class LoanServiceImpl implements LoanService {
         c.setTime(loanDate);
         c.add(Calendar.WEEK_OF_MONTH, 4 * (extendedLoan ? 2 : 1));
         return c.getTime();
+    }
+
+    /**
+     * Retourne vrai si l'emprunteur est le premier dans la file d'attente ou si la file est vide
+     *
+     * @param book   l'ouvrage
+     * @param loaner le numéro de l'emprunteur
+     * @return vrai ou faux
+     */
+    public boolean isLoanerNextInQueueOrEmptyQueue(Book book, String loaner) {
+        boolean test = false;
+        if (!book.getRequests().isEmpty()) {
+            test = book.getRequests().stream()
+                    .min(Comparator.comparing(Request::getRequestDate))
+                    .map(r -> r.getMember().getMemberNumber())
+                    .get().equals(loaner);
+        } else {
+            test = true;
+        }
+        return test;
+    }
+
+    /**
+     * Retourne l'id de la première requete à partir  d'un livre
+     *
+     * @param book l'ouvrage
+     * @return l'id
+     */
+    private Integer getRequestIdFromBookAndMember(Book book) {
+        return book.getRequests().stream().filter(r -> r.getAlertDate() != null)
+                .findFirst().get().getRequestId();
     }
 }

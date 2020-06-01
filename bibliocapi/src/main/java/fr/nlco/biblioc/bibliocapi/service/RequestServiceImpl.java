@@ -101,6 +101,7 @@ public class RequestServiceImpl implements RequestService {
         if (request.isPresent()) {
             request.get().setAlertDate(new Date());
             sendMailToMember(request.get());
+            requestRepository.save(request.get());
         }
     }
 

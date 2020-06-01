@@ -5,11 +5,9 @@ import fr.nlco.biblioc.bibliocapi.repository.BookRepository;
 import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
 import fr.nlco.biblioc.bibliocapi.repository.RequestRepository;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,7 +43,7 @@ class RequestServiceTest {
 
     @BeforeEach
     void initTests() {
-        this.requestService = new RequestServiceImpl(requestRepository,bookRepository,memberRepository,mailSender);
+        this.requestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, mailSender);
         doNothing().when(mailSender).send(any(SimpleMailMessage.class));
     }
 
@@ -53,14 +51,14 @@ class RequestServiceTest {
     void refreshBookRequests() throws ParseException {
         //Arrange
         List<Book> books = new ArrayList<>();
-        books.add(bookTest("bookP0R0",0, false, 0, false));
-        books.add(bookTest("bookP1R0",1, true, 0, false));
-        books.add(bookTest("bookP1R1",2, true, 1, false));
-        books.add(bookTest("bookP1R2",3, true, 2, false));
-        books.add(bookTest("bookP0R1",4, false, 1, false));
-        books.add(bookTest("bookP0R1",5, false, 2, false));
-        books.add(bookTest("bookP0R1",6, false, 1, true));
-        books.add(bookTest("bookP0R1",7, false, 2, true));
+        books.add(bookTest("bookP0R0", 0, false, 0, false));
+        books.add(bookTest("bookP1R0", 1, true, 0, false));
+        books.add(bookTest("bookP1R1", 2, true, 1, false));
+        books.add(bookTest("bookP1R2", 3, true, 2, false));
+        books.add(bookTest("bookP0R1", 4, false, 1, false));
+        books.add(bookTest("bookP0R1", 5, false, 2, false));
+        books.add(bookTest("bookP0R1", 6, false, 1, true));
+        books.add(bookTest("bookP0R1", 7, false, 2, true));
         doReturn(books).when(bookRepository).findAll();
         doReturn(Optional.of(books.get(6).getRequests().get(0))).when(requestRepository).findById(17);
         doReturn(Optional.of(books.get(7).getRequests().get(0))).when(requestRepository).findById(18);
@@ -86,7 +84,7 @@ class RequestServiceTest {
         Assert.assertEquals(8, books.size());
     }
 
-    private Book bookTest(String bookTitle, Integer bookId,boolean isPretEncours, Integer nbResa, boolean isResaExpire) throws ParseException {
+    private Book bookTest(String bookTitle, Integer bookId, boolean isPretEncours, Integer nbResa, boolean isResaExpire) throws ParseException {
         Book b = new Book();
         b.setBookId(bookId);
         b.setTitle(bookTitle);
@@ -112,8 +110,8 @@ class RequestServiceTest {
             }
             b.getRequests().add(r);
         }
-        for (Request r: b.getRequests()
-             ) {
+        for (Request r : b.getRequests()
+        ) {
             r.setBook(b);
         }
         return b;

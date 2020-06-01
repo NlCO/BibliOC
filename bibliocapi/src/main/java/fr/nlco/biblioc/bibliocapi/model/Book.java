@@ -57,10 +57,10 @@ public class Book implements Serializable {
      * @return une date
      */
     public Date getNextFirstReturnDate() {
-        Loan firstReturnLoan = copies.stream().filter(c -> c.getLoan() != null)
+        return copies.stream().filter(c -> c.getLoan() != null)
                 .map(Copy::getLoan)
-                .min(Comparator.comparing(l -> computeDate(l.getLoanDate(), l.isExtendedLoan()))).orElseThrow(NoSuchElementException::new);
-        return computeDate(firstReturnLoan.getLoanDate(), firstReturnLoan.isExtendedLoan());
+                .min(Comparator.comparing(l -> computeDate(l.getLoanDate(), l.isExtendedLoan())))
+                .map(loan -> computeDate(loan.getLoanDate(), loan.isExtendedLoan())).orElse(null);
     }
 
     /**

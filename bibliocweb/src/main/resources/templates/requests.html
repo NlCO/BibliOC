@@ -27,7 +27,11 @@
             <td th:utext="*{request.author}"></td>
             <td th:utext="*{request.type}"></td>
             <td th:utext="*{request.rank}"></td>
-            <td th:text="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></td>
+            <td>
+                <div th:if="*{request.returnFirstDate != null}" th:utext="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></div>
+                <div th:if="*{request.returnFirstDate == null && request.rank == 1}" th:utext="*{'A récuperer'}"></div>
+                <div th:if="*{request.returnFirstDate == null && request.rank > 1}" th:utext="${'dans 1 ou 2 mois'}"></div>
+            </td>
             <td><a class="btn btn-dark rounded" role="button" th:href="@{'/request/' + ${request.requestId} + '/annulation'}">Annuler</a>
             </td>
         </tr>
