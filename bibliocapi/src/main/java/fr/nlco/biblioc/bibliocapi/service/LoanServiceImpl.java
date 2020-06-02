@@ -148,16 +148,10 @@ public class LoanServiceImpl implements LoanService {
      * @return vrai ou faux
      */
     public boolean isLoanerNextInQueueOrEmptyQueue(Book book, String loaner) {
-        boolean test = false;
-        if (!book.getRequests().isEmpty()) {
-            test = book.getRequests().stream()
-                    .min(Comparator.comparing(Request::getRequestDate))
-                    .map(r -> r.getMember().getMemberNumber())
-                    .get().equals(loaner);
-        } else {
-            test = true;
-        }
-        return test;
+        return (book.getRequests().isEmpty()
+                || book.getRequests().stream().min(Comparator.comparing(Request::getRequestDate))
+                    .filter(r -> r.getMember().getMemberNumber().equals(loaner))
+                    .isPresent());
     }
 
     /**
@@ -167,7 +161,7 @@ public class LoanServiceImpl implements LoanService {
      * @return l'id
      */
     private Integer getRequestIdFromBookAndMember(Book book) {
-        return book.getRequests().stream().filter(r -> r.getAlertDate() != null)
-                .findFirst().get().getRequestId();
+        Request request = book.getRequests().stream().filter(r -> r.getAlertDate() != null).findFirst().orElseThrow(IllegalArgumentException::new);
+        return request.getRequestId();
     }
 }

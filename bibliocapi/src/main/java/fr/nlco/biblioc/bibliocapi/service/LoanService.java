@@ -6,7 +6,6 @@ import fr.nlco.biblioc.bibliocapi.dto.MemberLoansDto;
 import fr.nlco.biblioc.bibliocapi.model.Loan;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLDataException;
 import java.util.List;
 
 /**
