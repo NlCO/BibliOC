@@ -67,7 +67,7 @@ public class RequestController {
     @DeleteMapping("/request/{requestId}/cancel")
     public ResponseEntity<Void> cancelRequest(@PathVariable("requestId") Integer requestId) {
         try {
-            requestService.cancelRequest(requestId);
+            requestService.cancelRequest(requestId, true);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

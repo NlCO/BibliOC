@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 
@@ -28,7 +29,7 @@ class RequestControllerTest {
     @Test
     void cancelRequest_ReturnBadRequest_WhenRequestNotExist() {
         //Arrange
-        doThrow(NullPointerException.class).when(requestService).cancelRequest(anyInt());
+        doThrow(NullPointerException.class).when(requestService).cancelRequest(anyInt(),anyBoolean());
 
         //Act
         ResponseEntity<Void> response = requestController.cancelRequest(1);

@@ -4,6 +4,7 @@ import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.mapper.RequestMapper;
 import fr.nlco.biblioc.bibliocapi.model.Book;
+import fr.nlco.biblioc.bibliocapi.model.Copy;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import fr.nlco.biblioc.bibliocapi.model.Request;
 import fr.nlco.biblioc.bibliocapi.repository.BookRepository;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -47,12 +50,9 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     public Request createRequest(RequestDto requestToCreate) {
-        Book bookChecked = bookRepository.findById(requestToCreate.getBookId()).orElse(null);
-        Member memberChecked = memberRepository.findByMemberNumber(requestToCreate.getMemberNumber()).orElse(null);
-        if (bookChecked == null || memberChecked == null) return null;
-        if ((2 * bookChecked.getCopies().size() > bookChecked.getRequests().size())
-                && bookChecked.getCopies().stream().noneMatch(copy -> copy.getLoan() == null)
-                && bookChecked.getCopies().stream().noneMatch(copy -> copy.getLoan().getMember().getMemberNumber().equals(memberChecked.getMemberNumber()))) {
+        Book bookChecked = bookRepository.findById(requestToCreate.getBookId()).orElseThrow(IllegalArgumentException::new);
+        Member memberChecked = memberRepository.findByMemberNumber(requestToCreate.getMemberNumber()).orElseThrow(IllegalArgumentException::new);
+        if (isAllowedResquest(bookChecked, memberChecked.getMemberNumber())) {
             Request request = new Request();
             request.setBook(bookChecked);
             request.setMember(memberChecked);
@@ -76,18 +76,20 @@ public class RequestServiceImpl implements RequestService {
     }
 
     /**
-     * Methode premttant d'annuler une reservation
+     * Methode permettant d'annuler une reservation et d'alerter le suivant dans la file
      *
-     * @param requestId l'id de la réservattion
+     * @param requestId          l'id de la réservation
+     * @param checkNextRequester vrai si on doit alerter le suivant
      */
     @Override
-    public void cancelRequest(Integer requestId) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void cancelRequest(Integer requestId, boolean checkNextRequester) {
         Optional<Request> request = requestRepository.findById(requestId);
         if (request.isPresent()) {
             requestRepository.delete(request.get());
-            if (request.get().getAlertDate() != null) {
-                Integer bookId = request.get().getBook().getBookId();
-                alertNextRequester(Objects.requireNonNull(bookRepository.findById(bookId).orElse(null)));
+            if (!requestRepository.existsById(requestId) && request.get().getAlertDate() != null && checkNextRequester) {
+                Book book = bookRepository.findById(request.get().getBook().getBookId()).orElseThrow(null);
+                alertNextRequester(book);
             }
         }
     }
@@ -113,7 +115,7 @@ public class RequestServiceImpl implements RequestService {
         bookRepository.findAll().stream()
                 .filter(this::isFirstRequestOutdated)
                 .map(this::getOnGoingBookRequest)
-                .forEach(r -> cancelRequest(r.getRequestId()));
+                .forEach(r -> cancelRequest(r.getRequestId(), true));
     }
 
     /**
@@ -170,5 +172,19 @@ public class RequestServiceImpl implements RequestService {
      */
     private Request getOnGoingBookRequest(Book book) {
         return book.getRequests().stream().filter(r -> r.getAlertDate() != null).findFirst().orElse(null);
+    }
+
+    /**
+     * Determine si la demande de réservation est valide pour un livre
+     *
+     * @param book         le livre
+     * @param memberNumber le numéro de membre
+     * @return vrai ou faux
+     */
+    private boolean isAllowedResquest(Book book, String memberNumber) {
+        return (2 * book.getCopies().size() > book.getRequests().size())
+                && (book.getCopies().stream().allMatch(c -> c.getLoan() != null) || book.getRequests().stream().anyMatch(r -> r.getAlertDate() != null))
+                && book.getCopies().stream().map(Copy::getLoan).filter(Objects::nonNull).noneMatch(l -> l.getMember().getMemberNumber().equals(memberNumber))
+                && book.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(memberNumber));
     }
 }

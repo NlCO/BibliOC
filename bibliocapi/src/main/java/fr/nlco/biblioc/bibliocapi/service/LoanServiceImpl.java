@@ -11,6 +11,7 @@ import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -93,37 +94,21 @@ public class LoanServiceImpl implements LoanService {
      * @return le prêt si validé
      */
     @Override
+    @Transactional
     public Loan createLoan(LoanDto loanToCreate) {
-        //Copy copyChecked = copyRepository.findById(loanToCreate.getCopyId()).orElse(null);
-        //Optional<Member> memberChecked = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber());
-        //if (copyChecked == null || !memberChecked.isPresent()) return null;
-        //Optional<Loan> loanCheck = loanRepository.findByCopy(copyChecked);
-
         Copy copy = copyRepository.findById(loanToCreate.getCopyId()).orElseThrow(IllegalArgumentException::new);
         Member loaner = memberRepository.findByMemberNumber(loanToCreate.getMemberNumber()).orElseThrow(IllegalArgumentException::new);
-        Loan loan = null;
         if (copy.getLoan() == null && isLoanerNextInQueueOrEmptyQueue(copy.getBook(), loaner.getMemberNumber())) {
-            loan = new Loan();
+            Loan loan = new Loan();
             loan.setCopy(copy);
             loan.setMember(loaner);
             loan.setLoanDate(new Date());
-            //loan = loanRepository.save(loan);
-            //loan = loanRepository.saveAndFlush(loan);
-            //if (loanRepository.existsById(loan.getLoanId())) {
             if (!copy.getBook().getRequests().isEmpty()) {
-                requestService.cancelRequest(getRequestIdFromBookAndMember(copy.getBook()));
+                requestService.cancelRequest(getRequestIdFromBookAndMember(copy.getBook()), false);
             }
             return loanRepository.save(loan);
-            //}
         }
         return null;
-
-        //if (loanCheck.isPresent()) return null;
-        //Loan loan = new Loan();
-        //loan.setCopy(copyChecked);
-        //loan.setMember(memberChecked.get());
-        //loan.setLoanDate(new Date());
-        //return loanRepository.save(loan);
     }
 
     /**

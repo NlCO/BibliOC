@@ -31,11 +31,12 @@ public interface RequestService {
     List<MemberRequestDto> getMemberRequests(String membre);
 
     /**
-     * Methode premttant d'annuler une reservation
+     * Methode permettant d'annuler une reservation et d'alerter le suivant dans la file
      *
-     * @param requestId l'id de la réservattion
+     * @param requestId          l'id de la réservation
+     * @param checkNextRequester vrai si on doit alerter le suivant
      */
-    void cancelRequest(Integer requestId);
+    void cancelRequest(Integer requestId, boolean checkNextRequester);
 
     /**
      * Methode pour envoyer un mail à la première personne de la liste
