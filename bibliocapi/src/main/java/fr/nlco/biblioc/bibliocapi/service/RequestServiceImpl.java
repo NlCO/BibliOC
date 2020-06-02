@@ -111,7 +111,7 @@ public class RequestServiceImpl implements RequestService {
      * Permet de mettre à jour la liste d'attente des ouvrage de la bibliothèque
      */
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public void refreshBookRequests() {
         bookRepository.findAll().stream()
                 .filter(this::isFirstRequestOutdated)

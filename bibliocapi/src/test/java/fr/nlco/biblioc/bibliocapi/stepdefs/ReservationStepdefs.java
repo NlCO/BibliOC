@@ -1,6 +1,8 @@
 package fr.nlco.biblioc.bibliocapi.stepdefs;
 
+import fr.nlco.biblioc.bibliocapi.controller.LoanController;
 import fr.nlco.biblioc.bibliocapi.controller.RequestController;
+import fr.nlco.biblioc.bibliocapi.dto.LoanDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.*;
@@ -36,6 +38,8 @@ public class ReservationStepdefs {
 
     @Autowired
     RequestController requestController;
+    @Autowired
+    LoanController loanController;
     @Autowired
     BookRepository bookRepository;
     @Autowired
@@ -236,4 +240,35 @@ public class ReservationStepdefs {
     public void laMiseAJourAEteEffectuee() {
         Assert.assertEquals(ResponseEntity.accepted().build().getStatusCode(), requestTest.getStatusCode());
     }
+
+    @Given("un livre réservé par {} en premier et rendu par {}")
+    public void unLivreReserveParEtRenduPar(String membre, String ancienMembre) {
+        bookTest = createOneBookWithOneCopyLoaned(ancienMembre);
+        createARequest(bookTest, membre);
+        JavaMailSender spiedMailSender = spy(mailSender);
+        RequestService spiedRequestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, spiedMailSender);
+        LoanService spiedLoanService = new LoanServiceImpl(loanRepository, memberRepository, copyRepository, spiedRequestService);
+        doNothing().when(spiedMailSender).send(any(SimpleMailMessage.class));
+        spiedLoanService.returnLoan(bookTest.getCopies().get(0).getLoan().getLoanId());
+    }
+
+    @When("le membre {} l'emprunte")
+    public void leMembreLEmprunte(String emprunteur) {
+        LoanDto loanDto = new LoanDto();
+        loanDto.setCopyId(bookTest.getCopies().get(0).getCopyId());
+        loanDto.setMemberNumber(emprunteur);
+        requestTest = loanController.createLoan(loanDto);
+    }
+
+    @Then("le membre {} n'est plus dans la liste des reservations")
+    public void leMembreNEstPlusDansLaListeDesReservations(String membre) {
+        Assert.assertEquals(ResponseEntity.created(any(URI.class)).build().getStatusCode(), requestTest.getStatusCode());
+        Book book = bookRepository.findById(bookTest.getBookId()).orElse(null);
+        Assert.assertNotNull(book);
+        Assert.assertTrue(book.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(membre)));
+        Assert.assertTrue(book.getCopies().stream().anyMatch(c -> c.getLoan().getMember().getMemberNumber().equals(membre)));
+    }
+
+
+
 }

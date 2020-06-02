@@ -44,3 +44,8 @@ Feature: reservation
     Given Un service de batch appelant
     When il demande de mettre à jour les réservations
     Then la mise à jour a été effectuée
+
+  Scenario: Purge de la reservation après récupération de l'ouvrage réservé
+    Given un livre réservé par 2020020806 en premier et rendu par 2020020805
+    When le membre 2020020806 l'emprunte
+    Then le membre 2020020806 n'est plus dans la liste des reservations
