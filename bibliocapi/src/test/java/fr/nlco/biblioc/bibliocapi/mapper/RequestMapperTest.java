@@ -32,6 +32,7 @@ class RequestMapperTest {
         request.setRequestId(1);
         request.setBook(book);
         request.setMember(new Member());
+        request.setAlertDate(formatter.parse("23/05/2020"));
         MemberRequestDto expected = new MemberRequestDto();
         expected.setRequestId(1);
         expected.setTitle(book.getTitle());
@@ -42,6 +43,7 @@ class RequestMapperTest {
         c.add(Calendar.WEEK_OF_MONTH, 4);
         expected.setReturnFirstDate(c.getTime());
         expected.setRank(0);
+        expected.setAlertDate(formatter.parse("23/05/2020"));
 
         //Act
         MemberRequestDto result = mapper.requestToMemberRequestDto(request);
@@ -53,5 +55,6 @@ class RequestMapperTest {
         assertEquals(expected.getType(), result.getType());
         assertEquals(expected.getReturnFirstDate(), result.getReturnFirstDate());
         assertEquals(expected.getRank(), result.getRank());
+        assertEquals(expected.getAlertDate(), result.getAlertDate());
     }
 }

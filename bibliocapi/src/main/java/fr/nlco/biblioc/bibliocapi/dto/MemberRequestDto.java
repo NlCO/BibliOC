@@ -20,4 +20,5 @@ public class MemberRequestDto implements Serializable {
     private String type;
     private Date returnFirstDate;
     private Integer rank;
+    private Date alertDate;
 }

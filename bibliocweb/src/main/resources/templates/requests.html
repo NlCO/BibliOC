@@ -28,9 +28,15 @@
             <td th:utext="*{request.type}"></td>
             <td th:utext="*{request.rank}"></td>
             <td>
-                <div th:if="*{request.returnFirstDate != null}" th:utext="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></div>
-                <div th:if="*{request.returnFirstDate == null && request.rank == 1}" th:utext="*{'A récuperer'}"></div>
-                <div th:if="*{request.returnFirstDate == null && request.rank > 1}" th:utext="${'dans 1 ou 2 mois'}"></div>
+                <div th:switch="*{request.alertDate != null && request.rank == 1}">
+                    <div th:case="true">
+                        <div th:utext="*{'A récuperer'}"></div>
+                    </div>
+                    <div th:case="false">
+                        <div th:if="*{request.returnFirstDate != null}" th:utext="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></div>
+                        <div th:if="*{request.returnFirstDate == null && request.rank > 1}" th:utext="${'dans 1 ou 2 mois'}"></div>
+                    </div>
+                </div>
             </td>
             <td><a class="btn btn-dark rounded" role="button" th:href="@{'/request/' + ${request.requestId} + '/annulation'}">Annuler</a>
             </td>
