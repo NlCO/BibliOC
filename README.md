@@ -10,6 +10,8 @@ release 1.0.0 :
 Mise en place d'un site permettant aux usagers de BibliOC de consulter le catalogue, consulter leurs prêts et renouveler cette période une fois. 
 Mise en place d'un batch de mail de relance pour les retards de restitution de livres.
 
+release 1.1.0
+Ajout d'un fonctionnalite de réservation des ouvrages (https://github.com/NlCO/BibliOC/issues/1)
 
 ## Installation et déploiement
 1.Configuration
@@ -33,11 +35,11 @@ le module batch utilise le serveur SMTP local.
     
   * lancement de l'API
     
-        java -jar bibliocapi\target\bibliocapi-1.0.0.war
+        java -jar bibliocapi\target\bibliocapi-1.1.0.war
 
   * lancement du site WEB
     
-        java -jar bibliocweb\target\bibliocweb-1.0.0.war
+        java -jar bibliocweb\target\bibliocweb-1.1.0.war
           
 3.Accès - Utilisation
 
@@ -59,4 +61,4 @@ Une documentation swagger de l'API est disponible à l'adresse : http://localhos
 
 Après avoir démarrer le serveur SMTP, lancer la ligne de commande :
    
-    java -jar bibliocbatch\target\bibliocbatch-1.0.0.jar
+    java -jar bibliocbatch\target\bibliocbatch-1.1.0.jar
