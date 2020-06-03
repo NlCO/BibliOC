@@ -7,10 +7,7 @@ import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.*;
 import fr.nlco.biblioc.bibliocapi.repository.*;
-import fr.nlco.biblioc.bibliocapi.service.LoanService;
-import fr.nlco.biblioc.bibliocapi.service.LoanServiceImpl;
-import fr.nlco.biblioc.bibliocapi.service.RequestService;
-import fr.nlco.biblioc.bibliocapi.service.RequestServiceImpl;
+import fr.nlco.biblioc.bibliocapi.service.*;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -228,7 +225,7 @@ public class ReservationStepdefs {
         JavaMailSender spiedMailSender = spy(mailSender);
         RequestService spiedRequestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, spiedMailSender);
         doNothing().when(spiedMailSender).send(any(SimpleMailMessage.class));
-        requestController = new RequestController(spiedRequestService);
+        requestController = new RequestController(spiedRequestService, new BatchServiceImpl(bookRepository, spiedRequestService));
     }
 
     @When("il demande de mettre à jour les réservations")
@@ -268,7 +265,4 @@ public class ReservationStepdefs {
         Assert.assertTrue(book.getRequests().stream().noneMatch(r -> r.getMember().getMemberNumber().equals(membre)));
         Assert.assertTrue(book.getCopies().stream().anyMatch(c -> c.getLoan().getMember().getMemberNumber().equals(membre)));
     }
-
-
-
 }

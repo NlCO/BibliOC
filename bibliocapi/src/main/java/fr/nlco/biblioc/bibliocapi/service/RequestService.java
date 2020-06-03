@@ -46,6 +46,6 @@ public interface RequestService {
     /**
      * Permet de mettre à jour la liste d'attente des ouvrage de la bibliothèque
      */
-    void refreshBookRequests();
+    //void refreshBookRequests();
 }
 

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.mail.SimpleMailMessage;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RequestServiceTest {
 
-    RequestService requestService;
+    BatchService batchService;
 
     @Mock
     RequestRepository requestRepository;
@@ -43,7 +42,8 @@ class RequestServiceTest {
 
     @BeforeEach
     void initTests() {
-        this.requestService = new RequestServiceImpl(requestRepository, bookRepository, memberRepository, mailSender);
+        this.batchService = new BatchServiceImpl(bookRepository,
+                new RequestServiceImpl(requestRepository, bookRepository, memberRepository, mailSender));
         doNothing().when(mailSender).send(any(SimpleMailMessage.class));
     }
 
@@ -62,23 +62,19 @@ class RequestServiceTest {
         doReturn(books).when(bookRepository).findAll();
         doReturn(Optional.of(books.get(6).getRequests().get(0))).when(requestRepository).findById(17);
         doReturn(Optional.of(books.get(7).getRequests().get(0))).when(requestRepository).findById(18);
-        doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                books.get(6).getRequests().remove(0);
-                return null;
-            }
+        doAnswer((Answer<Void>) invocation -> {
+            books.get(6).getRequests().remove(0);
+            return null;
         }).when(requestRepository).delete(books.get(6).getRequests().get(0));
         doReturn(Optional.of(books.get(6))).when(bookRepository).findById(6);
-        doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                books.get(7).getRequests().remove(0);
-                return null;
-            }
+        doAnswer((Answer<Void>) invocation -> {
+            books.get(7).getRequests().remove(0);
+            return null;
         }).when(requestRepository).delete(books.get(7).getRequests().get(0));
         doReturn(Optional.of(books.get(7))).when(bookRepository).findById(7);
 
         //Act
-        requestService.refreshBookRequests();
+        batchService.refreshBookRequests();
 
         //Assert
         Assert.assertEquals(8, books.size());

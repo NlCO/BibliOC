@@ -3,6 +3,7 @@ package fr.nlco.biblioc.bibliocapi.controller;
 import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.dto.RequestDto;
 import fr.nlco.biblioc.bibliocapi.model.Request;
+import fr.nlco.biblioc.bibliocapi.service.BatchService;
 import fr.nlco.biblioc.bibliocapi.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,12 @@ import java.util.List;
 public class RequestController {
 
     private final RequestService requestService;
+    private final BatchService batchService;
 
     @Autowired
-    public RequestController(RequestService requestService) {
+    public RequestController(RequestService requestService, BatchService batchService) {
         this.requestService = requestService;
+        this.batchService = batchService;
     }
 
     /**
@@ -80,7 +83,7 @@ public class RequestController {
     @GetMapping("/request/refresh")
     public ResponseEntity<Void> refreshRequests() {
         try {
-            requestService.refreshBookRequests();
+            batchService.refreshBookRequests();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
