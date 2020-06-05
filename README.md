@@ -1,5 +1,10 @@
 # BibliOC
 
+[![Build Status](https://travis-ci.com/NlCO/BibliOC.svg?branch=master)](https://travis-ci.com/NlCO/BibliOC)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=alert_status)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=coverage)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
+
 ## Contexte
 Ce projet a été développé en 2020 dans le cadre du cursus "Développeur d'application Java" d'OpenClassrooms.
 
