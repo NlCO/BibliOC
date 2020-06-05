@@ -1,4 +1,4 @@
-# BibliOC
+# BibliOC [![GitHub release](https://img.shields.io/github/release/NlCO/BibliOC.svg)](https://GitHub.com/NlCO/BibliOC/releases/)
 
 [![Build Status](https://travis-ci.com/NlCO/BibliOC.svg?branch=master)](https://travis-ci.com/NlCO/BibliOC)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=alert_status)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
