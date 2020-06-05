@@ -1,6 +1,5 @@
 package fr.nlco.biblioc.bibliocweb.controller;
 
-import feign.FeignException;
 import fr.nlco.biblioc.bibliocweb.model.Book;
 import fr.nlco.biblioc.bibliocweb.model.BookRequest;
 import fr.nlco.biblioc.bibliocweb.proxies.BibliocapiProxy;
@@ -51,7 +50,7 @@ public class CatalogController {
         bookRequest.setMemberNumber(SecurityContextHolder.getContext().getAuthentication().getName());
         try {
             bibliocapiProxy.requestBook(bookRequest);
-        } catch (FeignException.FeignClientException ex) {
+        } catch (Exception ex) {
             return "redirect:/books";
         }
         return "redirect:/requests";

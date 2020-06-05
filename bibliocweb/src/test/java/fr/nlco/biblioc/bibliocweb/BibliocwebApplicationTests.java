@@ -12,10 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 class BibliocwebApplicationTests {
 
-	@Test
-	void contextLoads(@Autowired ConfigurableApplicationContext env) {
-		assertEquals(1, env.getEnvironment().getActiveProfiles().length);
-		assertEquals("test", env.getEnvironment().getActiveProfiles()[0]);
-	}
-
+    @Test
+    void contextLoads(@Autowired ConfigurableApplicationContext env) {
+        assertEquals(1, env.getEnvironment().getActiveProfiles().length);
+        assertEquals("test", env.getEnvironment().getActiveProfiles()[0]);
+    }
 }
