@@ -154,8 +154,8 @@ public class LoanServiceImpl implements LoanService {
     public boolean isLoanerNextInQueueOrEmptyQueue(Book book, String loaner) {
         return (book.getRequests().isEmpty()
                 || book.getRequests().stream().min(Comparator.comparing(Request::getRequestDate))
-                    .filter(r -> r.getMember().getMemberNumber().equals(loaner))
-                    .isPresent());
+                .filter(r -> r.getMember().getMemberNumber().equals(loaner))
+                .isPresent());
     }
 
     /**

@@ -1,10 +1,6 @@
 package fr.nlco.biblioc.bibliocapi.service;
 
-import fr.nlco.biblioc.bibliocapi.model.Book;
-import fr.nlco.biblioc.bibliocapi.model.Copy;
-import fr.nlco.biblioc.bibliocapi.model.Member;
-import fr.nlco.biblioc.bibliocapi.model.Request;
-import fr.nlco.biblioc.bibliocapi.model.Loan;
+import fr.nlco.biblioc.bibliocapi.model.*;
 import fr.nlco.biblioc.bibliocapi.repository.CopyRepository;
 import fr.nlco.biblioc.bibliocapi.repository.LoanRepository;
 import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
@@ -12,15 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.mockito.Mockito;
-
 import java.util.Calendar;
 import java.util.Optional;
 
@@ -44,10 +36,9 @@ class LoanServiceImplTest {
     @Mock
     RequestService requestService;
 
-
     @BeforeEach
     void initTests() {
-        loanService = new LoanServiceImpl(loanRepository,memberRepository,copyRepository,requestService);
+        loanService = new LoanServiceImpl(loanRepository, memberRepository, copyRepository, requestService);
     }
 
     @Test
