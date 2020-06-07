@@ -29,7 +29,7 @@
             <td th:text="*{#dates.format(loan.loanDate,'dd/MM/yyyy')}"></td>
             <td th:utext="*{#dates.format(loan.dueDate,'dd/MM/yyyy')}"></td>
             <td><a class="btn btn-dark rounded" role="button" th:href="@{'/loan/' + ${loan.loanId} + '/extend'}"
-                   th:if="*{!loan.getExtendedLoan()}">Prolonger</a>
+                   th:if="*{!loan.getExtendedLoan() and loan.dueDate.after(#dates.createToday())}">Prolonger</a>
             </td>
         </tr>
         </tbody>

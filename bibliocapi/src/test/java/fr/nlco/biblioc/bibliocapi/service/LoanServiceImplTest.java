@@ -4,6 +4,7 @@ import fr.nlco.biblioc.bibliocapi.model.Book;
 import fr.nlco.biblioc.bibliocapi.model.Copy;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import fr.nlco.biblioc.bibliocapi.model.Request;
+import fr.nlco.biblioc.bibliocapi.model.Loan;
 import fr.nlco.biblioc.bibliocapi.repository.CopyRepository;
 import fr.nlco.biblioc.bibliocapi.repository.LoanRepository;
 import fr.nlco.biblioc.bibliocapi.repository.MemberRepository;
@@ -18,9 +19,21 @@ import java.text.SimpleDateFormat;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.mockito.Mockito;
+
+import java.util.Calendar;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LoanServiceImplTest {
+
+    LoanServiceImpl loanService;
+    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
     @Mock
     LoanRepository loanRepository;
@@ -31,13 +44,57 @@ class LoanServiceImplTest {
     @Mock
     RequestService requestService;
 
-    LoanServiceImpl loanService;
-    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
     @BeforeEach
     void initTests() {
-        this.loanService = new LoanServiceImpl(loanRepository,memberRepository,copyRepository,requestService);
+        loanService = new LoanServiceImpl(loanRepository,memberRepository,copyRepository,requestService);
     }
+
+    @Test
+    void extendLoanPeriod_returnNull_whenLoanUnexists() {
+        //Arrange
+        doReturn(Optional.empty()).when(loanRepository).findById(anyInt());
+
+        //Act
+        Loan resultLoan = loanService.extendLoanPeriod(1);
+
+        //Assert
+        assertNull(resultLoan);
+    }
+
+    @Test
+    void extendLoanPeriod_returnNull_whenLoanDueDateIsExpired() {
+        //Arrange
+        Loan loan = new Loan();
+        Calendar c = Calendar.getInstance();
+        c.set(2020, 01, 11);
+        loan.setLoanDate(c.getTime());
+        doReturn(Optional.of(loan)).when(loanRepository).findById(anyInt());
+
+        //Act
+        Loan resultLoan = loanService.extendLoanPeriod(1);
+
+        //Assert
+        assertNull(resultLoan);
+    }
+
+    @Test
+    void extendLoanPeriod_returnExtendedLoan_whenLoanDueDateIsNotExpired() {
+        //Arrange
+        Loan loan = new Loan();
+        loan.setLoanDate(Calendar.getInstance().getTime());
+        assertFalse(loan.isExtendedLoan());
+        doReturn(Optional.of(loan)).when(loanRepository).findById(anyInt());
+        when(loanRepository.save(Mockito.any(Loan.class))).thenAnswer(a -> a.getArguments()[0]);
+
+        //Act
+        Loan resultLoan = loanService.extendLoanPeriod(1);
+
+        //Assert
+        assertNotNull(resultLoan);
+        assertTrue(resultLoan.isExtendedLoan());
+    }
+
 
     @Test
     void isLoanerNextInQueue() throws ParseException {
