@@ -33,11 +33,11 @@ le module batch utilise le serveur SMTP local.
     
   * lancement de l'API
     
-        java -jar bibliocapi\target\bibliocapi-1.0.0.war
+        java -jar bibliocapi\target\bibliocapi-1.0.1.war
 
   * lancement du site WEB
     
-        java -jar bibliocweb\target\bibliocweb-1.0.0.war
+        java -jar bibliocweb\target\bibliocweb-1.0.1.war
           
 3.Accès - Utilisation
 

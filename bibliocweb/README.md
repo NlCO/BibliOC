@@ -33,7 +33,7 @@ Au choix :
           
     - lancement du package généré dans le sous-répertoire target
      
-            java -jar target\bibliocweb-0.0.1-SNAPSHOT.war
+            java -jar target\bibliocweb-1.0.1-SNAPSHOT.war
 
 3.Accès
 

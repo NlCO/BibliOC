@@ -14,6 +14,8 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +47,7 @@ public class LoanServiceImpl implements LoanService {
     public List<MemberLoansDto> getMemberLoans(String memberNumber) {
         Member member = _MemberRepository.findByMemberNumber(memberNumber).orElse(null);
         List<MemberLoansDto> memberLoans = mapper.loansToMemberLoansDtos(_LoanRepository.findLoansByMember(member));
-        memberLoans.forEach(l -> l.setDueDate(ComputeDueDate(l.getLoanDate(), l.getExtendedLoan())));
+        memberLoans.forEach(l -> l.setDueDate(computeDueDate(l.getLoanDate(), l.getExtendedLoan())));
         return memberLoans;
     }
 
@@ -58,7 +60,9 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Loan extendLoanPeriod(Integer loanId) {
         Optional<Loan> loan = _LoanRepository.findById(loanId);
-        if (loan.isPresent()) {
+        LocalDate today = LocalDate.now();
+        if (loan.isPresent() && today.isBefore(computeDueDate(loan.get().getLoanDate(), loan.get().isExtendedLoan())
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
             loan.get().setExtendedLoan(true);
         } else {
             return null;
@@ -124,7 +128,7 @@ public class LoanServiceImpl implements LoanService {
      * @param extendedLoan prolongation de prêt (booléen)
      * @return date de retour du prêt
      */
-    private Date ComputeDueDate(Date loanDate, Boolean extendedLoan) {
+    private Date computeDueDate(Date loanDate, Boolean extendedLoan) {
         Calendar c = Calendar.getInstance();
         c.setTime(loanDate);
         c.add(Calendar.WEEK_OF_MONTH, 4 * (extendedLoan ? 2 : 1));
