@@ -3,8 +3,10 @@ package fr.nlco.biblioc.bibliocapi.stepdefs;
 import fr.nlco.biblioc.bibliocapi.controller.BookController;
 import fr.nlco.biblioc.bibliocapi.controller.LoanController;
 import fr.nlco.biblioc.bibliocapi.dto.BookStockDto;
+import fr.nlco.biblioc.bibliocapi.dto.LoanDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLateLoansDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLoansDto;
+import fr.nlco.biblioc.bibliocapi.model.Copy;
 import fr.nlco.biblioc.bibliocapi.model.Loan;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import fr.nlco.biblioc.bibliocapi.repository.BookRepository;
@@ -50,6 +52,8 @@ public class BibliocStepdefs {
     private ResponseEntity<Loan> extendLoanResponse;
 
     private ResponseEntity<List<MemberLateLoansDto>> responseEntityMemberlateloans;
+
+    private ResponseEntity<Void> createLoanResponse;
 
     @Given("Une bibliothèque disposant de plusieurs exemplaires de X ouvrages")
     public void uneBibliothqueDisposantDePlusieursExemplairesDeXOuvrages() {
@@ -144,5 +148,24 @@ public class BibliocStepdefs {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), responseEntityMemberlateloans.getStatusCode());
         Assert.assertNotNull(responseEntityMemberlateloans.getBody());
         Assert.assertFalse(responseEntityMemberlateloans.getBody().isEmpty());
+    }
+
+    @Given("l'exemplaire d'id {int} deja réservé")
+    public void lExemplaireDejaReerve(int copyId) {
+        Copy copy = copyRepository.findById(copyId).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
+        Assert.assertNotNull(copy.getLoan());
+    }
+
+    @When("le membre {} demande le pret de l'exemplaire d'id {int} tout de même")
+    public void leMembreDemandeLePretDeLExemplaireToutDeMeme(String mumberNumber, int copyId) {
+        LoanDto loanDto = new LoanDto();
+        loanDto.setCopyId(copyId);
+        loanDto.setMemberNumber(mumberNumber);
+        createLoanResponse = loanController.createLoan(loanDto);
+    }
+
+    @Then("le prêt de l'exemplaire est refusé")
+    public void lePretDeLExmplaireEstRefuse() {
+        Assert.assertEquals(ResponseEntity.badRequest().build().getStatusCode(), createLoanResponse.getStatusCode());
     }
 }
