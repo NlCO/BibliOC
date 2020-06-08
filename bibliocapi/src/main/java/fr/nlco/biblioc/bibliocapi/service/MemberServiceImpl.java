@@ -13,12 +13,12 @@ import java.util.Optional;
 @Service("MemberService")
 public class MemberServiceImpl implements MemberService {
 
-    private final MemberRepository _MemberRepository;
+    private final MemberRepository memberRepository;
     private MemberMapper mapper = Mappers.getMapper(MemberMapper.class);
 
     @Autowired
     public MemberServiceImpl(MemberRepository memberRepository) {
-        this._MemberRepository = memberRepository;
+        this.memberRepository = memberRepository;
     }
 
     /**
@@ -29,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberCredDto getMemberCred(String memberNumber) {
-        Optional<Member> member = _MemberRepository.findByMemberNumber(memberNumber);
-        return member.map(m -> mapper.MemberToMemberCredDto(m)).orElse(null);
+        Optional<Member> member = memberRepository.findByMemberNumber(memberNumber);
+        return member.map(m -> mapper.memberToMemberCredDto(m)).orElse(null);
     }
 }

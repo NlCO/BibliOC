@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
-    MemberCredDto MemberToMemberCredDto(Member member);
+    MemberCredDto memberToMemberCredDto(Member member);
 }

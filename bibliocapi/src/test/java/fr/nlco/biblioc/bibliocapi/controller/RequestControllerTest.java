@@ -1,5 +1,6 @@
 package fr.nlco.biblioc.bibliocapi.controller;
 
+import fr.nlco.biblioc.bibliocapi.dto.MemberRequestDto;
 import fr.nlco.biblioc.bibliocapi.service.BatchService;
 import fr.nlco.biblioc.bibliocapi.service.RequestService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,9 +10,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,5 +55,17 @@ class RequestControllerTest {
 
         //Assert
         assertEquals(ResponseEntity.badRequest().build().getStatusCode(), response.getStatusCode());
+    }
+
+    @Test
+    void getMemberRequests_ReturnNoContent_WhenNoResquestForUser() {
+        //Arrange
+        doReturn(null).when(requestService).getMemberRequests(anyString());
+
+        //Act
+        ResponseEntity<List<MemberRequestDto>> response = requestController.getMemberRequests("12345678");
+
+        //Assert
+        assertEquals(ResponseEntity.noContent().build().getStatusCode(), response.getStatusCode());
     }
 }
