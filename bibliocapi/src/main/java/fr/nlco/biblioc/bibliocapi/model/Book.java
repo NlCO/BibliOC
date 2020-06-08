@@ -1,6 +1,7 @@
 package fr.nlco.biblioc.bibliocapi.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Book implements Serializable {
 
     @Id
@@ -38,9 +40,6 @@ public class Book implements Serializable {
 
     @Transient
     private Date nextFirstReturnDate;
-
-    public Book() {
-    }
 
     /**
      * Methode pour obtenir le nombre d'exemplaire disponible par biblithèque

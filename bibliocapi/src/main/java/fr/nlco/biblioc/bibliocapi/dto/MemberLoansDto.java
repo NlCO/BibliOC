@@ -1,6 +1,7 @@
 package fr.nlco.biblioc.bibliocapi.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class MemberLoansDto implements Serializable {
     private Integer loanId;
     private String title;
@@ -20,7 +22,4 @@ public class MemberLoansDto implements Serializable {
     private Date dueDate;
     private Boolean extendedLoan;
     private String library;
-
-    public MemberLoansDto() {
-    }
 }
