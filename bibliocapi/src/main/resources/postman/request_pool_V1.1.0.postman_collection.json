@@ -1,0 +1,691 @@
+{
+	"info": {
+		"_postman_id": "4ed702c8-6ecb-4cb1-b434-5a22cd9c2863",
+		"name": "TEST V1.1.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Liste des livres",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c484fe99-ff29-4121-93b0-f1c055264fa0",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Au moins 1 livre\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.gte(1);\r",
+							"});\r",
+							"\r",
+							"var schema = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": [{\r",
+							"        type: \"object\",\r",
+							"        properties:{\r",
+							"         \"bookId\": {\r",
+							"             \"type\":\"integer\"\r",
+							"            },\r",
+							"         \"title\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"author\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"type\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"nbCopy\": {\r",
+							"             \"type\":\"integer\"\r",
+							"            },\r",
+							"         \"nbAvailable\": {\r",
+							"             \"type\":\"integer\"\r",
+							"            },\r",
+							"         \"availabilityByLibrary\": {\r",
+							"             \"type\" : [\"null\", \"object\"],\r",
+							"             \"properties\" : {},\r",
+							"             \"additionalProperties\": true\r",
+							"            },\r",
+							"         \"nbRequested\": {\r",
+							"             \"type\":\"integer\"\r",
+							"            },\r",
+							"         \"resquestable\": {\r",
+							"             \"type\":\"boolean\"\r",
+							"            },\r",
+							"         \"resquestable\": {\r",
+							"             \"const\": [\"null\", \"string\"]\r",
+							"            }\r",
+							"        }\r",
+							"    }]\r",
+							"};\r",
+							"\r",
+							"pm.test('Schema is valid', function() {\r",
+							"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/books/2020020801",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"books",
+						"2020020801"
+					]
+				},
+				"description": "Avec les dispos pour le membre 2020020801"
+			},
+			"response": []
+		},
+		{
+			"name": "Liste des prets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b4cb2081-5820-45aa-a36b-de81b0e4ecc1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Au moins 1 prêt\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.gte(1);\r",
+							"});\r",
+							"\r",
+							"var schema = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": [{\r",
+							"        type: \"object\",\r",
+							"        properties:{\r",
+							"         \"loanId\": {\r",
+							"             \"type\":\"integer\"\r",
+							"            },\r",
+							"         \"title\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"author\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"type\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"loanDate\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"dueDate\": {\r",
+							"             \"type\":\"string\"\r",
+							"            },\r",
+							"         \"extendedLoan\": {\r",
+							"             \"type\":\"boolean\"\r",
+							"            },\r",
+							"         \"library\": {\r",
+							"             \"type\":\"string\"\r",
+							"            }\r",
+							"        }\r",
+							"    }]\r",
+							"};\r",
+							"\r",
+							"pm.test('Schema is valid', function() {\r",
+							"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/2020020801",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"2020020801"
+					]
+				},
+				"description": "2 prets pour le user 2020020801"
+			},
+			"response": []
+		},
+		{
+			"name": "Liste des prets - vide",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7dc858a4-86a2-4013-abde-791fdbcee7c1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Pas de prêt en cours\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.eql(0);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/2020020804",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"2020020804"
+					]
+				},
+				"description": "2 prets pour le user 2020020801"
+			},
+			"response": []
+		},
+		{
+			"name": "Prolongation d'un prêt refusé",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eb2d4567-bee6-4f18-95fe-b93de5de70d8",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/1/extend",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"1",
+						"extend"
+					]
+				},
+				"description": "exemplaire 1"
+			},
+			"response": []
+		},
+		{
+			"name": "Prolongation d'un prêt OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b42259e6-dc5f-4804-b58c-99e0d3a08bc1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/2/extend",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"2",
+						"extend"
+					]
+				},
+				"description": "exemplaire 1"
+			},
+			"response": []
+		},
+		{
+			"name": "resa livre 1 user 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8fc4a7e3-f839-421b-9e0d-781c16d1460f",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"bookId\":1, \"memberNumber\":\"2020020802\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/request",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resa livre 1 user 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "117431bc-2651-4e0e-9052-f03c6b548ffe",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"bookId\":1, \"memberNumber\":\"2020020803\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/request",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resa livre 1 user 3 KO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cb325329-a72f-4b39-a0cd-5f414fa57dc4",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"bookId\":1, \"memberNumber\":\"2020020803\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/request",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "retour pret livre 1 exemplaire 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "112d82ab-7208-4f18-b74c-7aa016c6da9a",
+						"exec": [
+							"pm.test(\"Status code is 202\", function () {\r",
+							"    pm.response.to.have.status(202);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/1/return",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"1",
+						"return"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Annulation de réservation livre user 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "502b3e21-1cb1-4923-aa80-fe41ae2e5ed0",
+						"exec": [
+							"pm.test(\"Status code is 202\", function () {\r",
+							"    pm.response.to.have.status(202);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/request/3/cancel",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request",
+						"3",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pret par user 2 à tort",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6acb08e5-09e8-49ad-ae92-3cb3da0d6bb8",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"copyId\":1, \"memberNumber\":\"2020020802\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/loan",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pret livre  réservé par user 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "120be443-7da0-44d0-9924-be233a8a6602",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"copyId\":1, \"memberNumber\":\"2020020803\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/loan",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Liste resa user 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bc9aefee-f0ac-4c87-9566-6839ec6d7f2d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/request/2020020803",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request",
+						"2020020803"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Liste retour en retard",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9b729248-6264-466a-b7f0-ff31c465464e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Nombre de membres avec des prêts en retard\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/loan/late",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"loan",
+						"late"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh réservation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "45daf4f4-231a-4567-8215-126e1c743ce3",
+						"exec": [
+							"pm.test(\"Status code is 202\", function () {\r",
+							"    pm.response.to.have.status(202);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/request/refresh",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"request",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
