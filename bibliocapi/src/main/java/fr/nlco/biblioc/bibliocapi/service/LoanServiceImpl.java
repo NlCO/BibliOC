@@ -79,16 +79,16 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public List<MemberLateLoansDto> getLateLoans() {
         List<Member> members = memberRepository.findAll();
-        List<Member> membersWithLoans = members.stream().filter(m -> m.getLoans().size() > 0).collect(Collectors.toList());
+        List<Member> membersWithLoans = members.stream().filter(m -> !m.getLoans().isEmpty()).collect(Collectors.toList());
         Date today = new Date();
         List<MemberLateLoansDto> lateLoans = new ArrayList<>();
         for (Member m : membersWithLoans) {
             List<MemberLoansDto> memberLateLoans = getMemberLoans(m.getMemberNumber());
             memberLateLoans = memberLateLoans.stream().filter(l -> l.getDueDate().before(today)).collect(Collectors.toList());
-            if (memberLateLoans.size() > 0)
+            if (!memberLateLoans.isEmpty())
                 lateLoans.add(mapper.memberLateLoansToMemberLateLoansDto(m, memberLateLoans));
         }
-        return lateLoans.stream().filter(m -> m.getLateLoanList().size() > 0).collect(Collectors.toList());
+        return lateLoans.stream().filter(m -> !m.getLateLoanList().isEmpty()).collect(Collectors.toList());
     }
 
     /**
@@ -137,7 +137,7 @@ public class LoanServiceImpl implements LoanService {
      * @param extendedLoan prolongation de prêt (booléen)
      * @return date de retour du prêt
      */
-    private Date computeDueDate(Date loanDate, Boolean extendedLoan) {
+    private Date computeDueDate(Date loanDate, boolean extendedLoan) {
         Calendar c = Calendar.getInstance();
         c.setTime(loanDate);
         c.add(Calendar.WEEK_OF_MONTH, 4 * (extendedLoan ? 2 : 1));
