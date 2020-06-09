@@ -24,8 +24,3 @@ Feature: BiblioOCapi
     Given une base avec au moins un utilisateur ayant un prêt en retard
     When on interroge la liste des prêts en retard
     Then une liste contenant les membres est retournée
-
-  Scenario: réservations à tort
-    Given l'exemplaire d'id 5 deja réservé
-    When le membre 2020020804 demande le pret de l'exemplaire d'id 5 tout de même
-    Then le prêt de l'exemplaire est refusé
