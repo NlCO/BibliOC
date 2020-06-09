@@ -17,6 +17,8 @@
             <th data-align="center" data-halign="center" data-sortable="true">Auteur</th>
             <th data-align="center" data-halign="center" data-sortable="true">Type</th>
             <th data-align="center" data-halign="center">Disponibilité</th>
+            <th data-align="center" data-halign="center">Réservation</th>
+            <th data-align="center" data-halign="center"></th>
         </tr>
         </thead>
         <tbody>
@@ -25,8 +27,35 @@
             <td th:utext="*{book.author}"></td>
             <td th:text="*{book.type}"></td>
             <td>
-                <div th:each="entry: *{book.getAvailabilityByLibrary()}">
-                    <span th:utext="${entry.key + ' : ' + entry.value}"></span>
+                <div th:switch="*{book.nbAvailable == 0}">
+                    <div th:case="false">
+                        <div th:if="*{book.nbRequested > 0}" th:utext="${'Réservé'}"></div>
+                        <div th:if="*{book.nbRequested == 0}">
+                            <div th:each="entry: *{book.getAvailabilityByLibrary()}" class="row justify-content-around">
+                                <span th:utext="${entry.key + ' : ' + entry.value}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:case="true">
+                        <div th:if="*{book.nbCopy > 0}" th:utext="'Retour prévu le ' + *{#dates.format(book.nextReturnDate,'dd/MM/yyyy')}"></div>
+                        <div th:if="*{book.nbCopy == 0}" th:utext="${'En cours d''approvisionnement'}"></div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div th:if="*{book.nbCopy > 0 && (book.nbAvailable == 0 || book.nbRequested > 0)}" th:text="*{book.nbRequested}"></div>
+            </td>
+            <td>
+                <div th:switch="*{book.isResquestable()}">
+                    <div th:case="true">
+                        <a class="btn btn-dark rounded" role="button" th:href="@{|/book/${book.bookId}/request|}">Réserver</a>
+                    </div>
+                    <div th:case="false">
+                        <div th:if="*{book.nbCopy > 0 && (book.nbAvailable == 0 || book.nbRequested > 0)}">
+                            <div th:if="*{book.nbRequested == book.nbCopy * 2}" th:utext="${'File d''attente pleine'}"></div>
+                            <div th:if="*{book.nbRequested < book.nbCopy * 2}" th:utext="${'Prêt ou réservation en cours'}"></div>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>

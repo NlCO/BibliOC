@@ -11,9 +11,9 @@ import java.util.List;
 @Service
 public interface BookService {
     /**
-     * Methode retournant la liste des livres de la bibliothèque avec leur disponibilité
+     * Methode retournant la liste des livres de la bibliothèque avec leur disponibilité pour un membre
      *
      * @return liste de livres
      */
-    List<BookStockDto> getBooksStock();
+    List<BookStockDto> getBooksStock(String memberNumber);
 }

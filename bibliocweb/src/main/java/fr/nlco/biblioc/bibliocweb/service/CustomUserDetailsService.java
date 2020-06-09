@@ -21,16 +21,16 @@ import java.util.Set;
 @Qualifier("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final BibliocapiProxy _BibliocapiProxy;
+    private final BibliocapiProxy bibliocapiProxy;
 
     @Autowired
     public CustomUserDetailsService(BibliocapiProxy bibliocapiProxy) {
-        this._BibliocapiProxy = bibliocapiProxy;
+        this.bibliocapiProxy = bibliocapiProxy;
     }
 
     @Override
     public UserDetails loadUserByUsername(String memberNumber) throws UsernameNotFoundException {
-        Member member = _BibliocapiProxy.getMemberAuthByMemberNumber(memberNumber);
+        Member member = bibliocapiProxy.getMemberAuthByMemberNumber(memberNumber);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("Member"));
         return new org.springframework.security.core.userdetails.User(member.getMemberNumber(), member.getPassword(), grantedAuthorities);

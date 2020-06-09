@@ -16,12 +16,12 @@ import java.util.List;
 @Service("ReminderService")
 public class ReminderServiceImpl implements ReminderService {
 
-    private final BibliocapiProxy _BibliocapiProxy;
+    private final BibliocapiProxy bibliocapiProxy;
     private final JavaMailSender mailSender;
 
     @Autowired
     public ReminderServiceImpl(BibliocapiProxy bibliocapiProxy, JavaMailSender mailSender) {
-        this._BibliocapiProxy = bibliocapiProxy;
+        this.bibliocapiProxy = bibliocapiProxy;
         this.mailSender = mailSender;
     }
 
@@ -30,7 +30,7 @@ public class ReminderServiceImpl implements ReminderService {
      */
     @Override
     public void sendReminderMails() {
-        List<MembersLateLoans> membersLateLoansList = _BibliocapiProxy.getLateLaonsMembers();
+        List<MembersLateLoans> membersLateLoansList = bibliocapiProxy.getLateLaonsMembers();
         for (MembersLateLoans memberWithLateLoan : membersLateLoansList) {
             sendMailToMember(memberWithLateLoan);
         }
@@ -42,7 +42,6 @@ public class ReminderServiceImpl implements ReminderService {
      * @param memberLateLaons informations sur les prêts en retard et le membre
      */
     private void sendMailToMember(MembersLateLoans memberLateLaons) {
-        System.out.println(memberLateLaons.getEmail());
         SimpleMailMessage email = createEmail(memberLateLaons);
         mailSender.send(email);
     }
@@ -64,7 +63,7 @@ public class ReminderServiceImpl implements ReminderService {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setFrom("gestionnaire@biblioc.fr");
         email.setTo(memberLateLaons.getEmail());
-        email.setSubject("[BILIOC] - Retard de retour d'emprunt");
+        email.setSubject("[BILIOC] - Retard de retour d'emprunt du membre " + memberLateLaons.getMemberNumber());
         email.setText(body.toString());
 
         return email;

@@ -14,16 +14,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class MembersLateLoansTasklet implements Tasklet {
 
-    private final ReminderService _ReminderService;
+    private final ReminderService reminderService;
 
     @Autowired
     public MembersLateLoansTasklet(ReminderService reminderService) {
-        this._ReminderService = reminderService;
+        this.reminderService = reminderService;
     }
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        _ReminderService.sendReminderMails();
+        reminderService.sendReminderMails();
         return RepeatStatus.FINISHED;
     }
 }

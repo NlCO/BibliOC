@@ -1,4 +1,9 @@
-# BibliOC
+# BibliOC [![GitHub release](https://img.shields.io/github/release/NlCO/BibliOC.svg)](https://GitHub.com/NlCO/BibliOC/releases/)
+
+[![Build Status](https://travis-ci.com/NlCO/BibliOC.svg?branch=master)](https://travis-ci.com/NlCO/BibliOC)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=alert_status)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=NlCO_BibliOC&metric=coverage)](https://sonarcloud.io/dashboard?id=NlCO_BibliOC)
 
 ## Contexte
 Ce projet a été développé en 2020 dans le cadre du cursus "Développeur d'application Java" d'OpenClassrooms.
@@ -10,6 +15,8 @@ release 1.0.0 :
 Mise en place d'un site permettant aux usagers de BibliOC de consulter le catalogue, consulter leurs prêts et renouveler cette période une fois. 
 Mise en place d'un batch de mail de relance pour les retards de restitution de livres.
 
+release 1.1.0
+Ajout d'un fonctionnalite de réservation des ouvrages (https://github.com/NlCO/BibliOC/issues/1)
 
 ## Installation et déploiement
 1.Configuration
@@ -33,11 +40,11 @@ le module batch utilise le serveur SMTP local.
     
   * lancement de l'API
     
-        java -jar bibliocapi\target\bibliocapi-1.0.1.war
+        java -jar bibliocapi\target\bibliocapi-1.1.0.war
 
   * lancement du site WEB
     
-        java -jar bibliocweb\target\bibliocweb-1.0.1.war
+        java -jar bibliocweb\target\bibliocweb-1.1.0.war
           
 3.Accès - Utilisation
 
@@ -59,4 +66,4 @@ Une documentation swagger de l'API est disponible à l'adresse : http://localhos
 
 Après avoir démarrer le serveur SMTP, lancer la ligne de commande :
    
-    java -jar bibliocbatch\target\bibliocbatch-1.0.0.jar
+    java -jar bibliocbatch\target\bibliocbatch-1.1.0.jar

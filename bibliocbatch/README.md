@@ -5,10 +5,13 @@ Ce projet a été développé en 2020 dans le cadre du cursus "Développeur d'ap
 Ce batch permet d'envoyer un mail de rappel aux membres ayant dépassé la date de retour d'au moins 1 de leur prêt.
 Il se base sur l'API BibliOC-API (https://github.com/NlCO/BibliOC-API)
 
+version 1.1.0 - projet OC 10
+Ajout de la fonctionalité de refresh des réservations
+
 ## Pré-requis
 Version de java : 1.8 (jdk utilisé : jdk1.8.0_202)
 Maven 3.6
-L'API BibliOC-API (https://github.com/NlCO/BibliOC-API)
+L'API BibliOCAPI dans le meme repo
 Un serveur SMTP
 
 ## Installation et déploiement
@@ -24,7 +27,7 @@ Le repo est configuré pour l'utilisation d'un serveur SMTP local fakeSMTP (http
      
         mvn clean package
 
-- un fichier "bibliocbatch-0.0.1-SNAPSHOT.jar" dans le sous-repertoire target doit être généré
+- un fichier "bibliocbatch-1.1.0.jar" dans le sous-repertoire target doit être généré
 
 3.Utilisation
 
@@ -32,5 +35,5 @@ Le repo est configuré pour l'utilisation d'un serveur SMTP local fakeSMTP (http
 
 - Ordonnancer avec le scheduler de votre choix la commande :
 
-        java -jar <chemin de votre fichier>\bibliocbatch-0.0.1-SNAPSHOT.jar
+        java -jar <chemin de votre fichier>\bibliocbatch-1.1.0.jar
 

@@ -4,6 +4,9 @@
 Ce projet a été développé en 2020 dans le cadre du cursus "Développeur d'application Java" d'OpenClassrooms et correspond à la partie WEB du projet 7.
 Ce site permet aux usagers de consulter le catalogue de consulter leurs prêts de BibliOC.
 
+version 1.1.0 - projet OC 10
+Ajout de la fonctionalité des réservations
+
 ## Pré-requis
 Version de java : 1.8 (jdk utilisé : jdk1.8.0_202)
  
@@ -33,7 +36,7 @@ Au choix :
           
     - lancement du package généré dans le sous-répertoire target
      
-            java -jar target\bibliocweb-1.0.1-SNAPSHOT.war
+            java -jar target\bibliocweb-1.1.0.war
 
 3.Accès
 
