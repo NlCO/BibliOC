@@ -1,6 +1,8 @@
 package fr.nlco.biblioc.bibliocweb.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -10,12 +12,9 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoanR2 implements Serializable {
     private Integer copyId;
     private String memberNumber;
-
-    public LoanR2(Integer copyId, String memberNumber) {
-        this.copyId = copyId;
-        this.memberNumber = memberNumber;
-    }
 }

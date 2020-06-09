@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>fr.nlco.biblioc</groupId>
 	<artifactId>bibliocapi</artifactId>
-	<version>1.0.1</version>
+	<version>1.1.0</version>
 	<packaging>war</packaging>
 	<name>bibliocapi</name>
 	<description>API pour le projet BibliOC</description>
@@ -100,6 +100,12 @@
 		</dependency>
 		<!-- End of Swagger dependencies : for API documentation -->
 
+		<!-- Begin of mailing dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<!-- End of mailing dependencies -->
 	</dependencies>
 
 	<build>
@@ -137,7 +143,7 @@
 								<rule>
 									<limits>
 										<limit>
-											<minimum>0.1</minimum>
+											<minimum>0.9</minimum>
 										</limit>
 									</limits>
 								</rule>

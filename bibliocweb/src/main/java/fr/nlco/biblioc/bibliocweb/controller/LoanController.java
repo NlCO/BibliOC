@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -18,11 +17,11 @@ import java.util.List;
 @Controller
 public class LoanController {
 
-    private final BibliocapiProxy _BibliocapiProxy;
+    private final BibliocapiProxy bibliocapiProxy;
 
     @Autowired
     public LoanController(BibliocapiProxy bibliocapiProxy) {
-        this._BibliocapiProxy = bibliocapiProxy;
+        this.bibliocapiProxy = bibliocapiProxy;
     }
 
     /**
@@ -34,7 +33,7 @@ public class LoanController {
     @GetMapping("/loans")
     public String getMemberLoans(Model model) {
         String memberNumber = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<Loan> loans = _BibliocapiProxy.getMemberLoans(memberNumber);
+        List<Loan> loans = bibliocapiProxy.getMemberLoans(memberNumber);
         model.addAttribute("loans", loans);
         return "loans";
     }
@@ -45,9 +44,9 @@ public class LoanController {
      * @param loanId Id du prêt à prolonger
      * @return redirection sur la page des prêts
      */
-    @RequestMapping("/loan/{loanId}/extend")
+    @GetMapping("/loan/{loanId}/extend")
     public String extendLoans(@PathVariable("loanId") Integer loanId) {
-        _BibliocapiProxy.extendLoan(loanId);
+        bibliocapiProxy.extendLoan(loanId);
         return "redirect:/loans";
     }
 }

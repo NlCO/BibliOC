@@ -1,9 +1,6 @@
 package fr.nlco.biblioc.bibliocweb.proxies;
 
-import fr.nlco.biblioc.bibliocweb.model.Book;
-import fr.nlco.biblioc.bibliocweb.model.Loan;
-import fr.nlco.biblioc.bibliocweb.model.LoanR2;
-import fr.nlco.biblioc.bibliocweb.model.Member;
+import fr.nlco.biblioc.bibliocweb.model.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +18,8 @@ public interface BibliocapiProxy {
      *
      * @return la liste des livres
      */
-    @GetMapping("/books")
-    List<Book> getBooks();
+    @GetMapping("/books/{memberNumber}")
+    List<Book> getBooks(@PathVariable("memberNumber") String memberNumber);
 
     /**
      * Récupération de la liste des emprunts d'un usager
@@ -47,6 +44,33 @@ public interface BibliocapiProxy {
      */
     @GetMapping("member/{memberNumber}")
     Member getMemberAuthByMemberNumber(@PathVariable("memberNumber") String memberNumber);
+
+    /**
+     * Récupération de la liste des réservations d'un usager
+     *
+     * @param memberNumber identifiant de l'usager
+     * @return la liste de ses reservations
+     */
+    @GetMapping("/request/{memberNumber}")
+    List<Request> getMemberRequests(@PathVariable("memberNumber") String memberNumber);
+
+    /**
+     * Demande de réservation d'un livre
+     *
+     * @param request info pour la réservation
+     * @return Responseentity
+     */
+    @PostMapping("/request")
+    ResponseEntity<Void> requestBook(@RequestBody BookRequest request);
+
+    /**
+     * Demande d'annualtion de reservation
+     *
+     * @param requestId id de la réservation
+     * @return ResponseEntity
+     */
+    @DeleteMapping("/request/{requestId}/cancel")
+    ResponseEntity<Void> cancelRequest(@PathVariable("requestId") Integer requestId);
 
     /**
      * Fonction pour le release 2 : reservation

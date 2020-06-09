@@ -1,21 +1,31 @@
 Feature: BiblioOCapi
 
-  Scenario: Get list of books and their availability
-    Given a library with n copies of y books
-    When I ask the list of books
-    Then a list of y books with their availability is returned
+  Scenario: List de livre de la bibliothèque
+    Given Une bibliothèque disposant de plusieurs exemplaires de X ouvrages
+    When Le membre 2020020802 demande la liste des ouvrages
+    Then La liste des X ouvrages avec leur disponibilté est retournée
 
-  Scenario: Get member's loaned books
-    Given the member 2020020801 with loaned books
-    When he consult his loans
-    Then a list of his loaned book is returned
+  Scenario: Liste des prêts
+    Given un membre 2020020801 avec au moins un prêt
+    When le membre consulte la liste de ses prêts
+    Then la liste de ses prêts est obtenue
 
-  Scenario: Extend once the loaned period
-    Given a loaned book which due date is not extended
-    When the loan period is extended
-    Then the book is flagged with the extend loaning period
+  Scenario: Prolonger une fois un prêt non expiré
+    Given un prêt non expiré et non prolongé
+    When une demande de prolonagation est demandée
+    Then le prêt est marqué comme prolongé
 
-  Scenario: list member with their late loans
-    Given a list of 4 members in the database
-    When the batch look for late loans of member
-    Then a list of 2 member is return
+  Scenario: Impossibilté de prolonger un prêt en reatrd
+    Given un prêt en retard et non prolongé
+    When une demande de prolonagation est demandée
+    Then le prêt reste marqué comme non prolongé
+
+  Scenario: Liste des prêts en retards
+    Given une base avec au moins un utilisateur ayant un prêt en retard
+    When on interroge la liste des prêts en retard
+    Then une liste contenant les membres est retournée
+
+  Scenario: réservations à tort
+    Given l'exemplaire d'id 5 deja réservé
+    When le membre 2020020804 demande le pret de l'exemplaire d'id 5 tout de même
+    Then le prêt de l'exemplaire est refusé

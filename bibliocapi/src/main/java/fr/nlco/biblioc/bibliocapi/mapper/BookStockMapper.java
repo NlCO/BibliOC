@@ -4,7 +4,6 @@ import fr.nlco.biblioc.bibliocapi.dto.BookStockDto;
 import fr.nlco.biblioc.bibliocapi.model.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 
@@ -28,9 +27,10 @@ public interface BookStockMapper {
      * @param book livre
      * @return livre avec ses disponibiltés
      */
-    @Mappings({
-            @Mapping(target = "nbCopy", expression = "java(book.getCopies().size())"),
-            @Mapping(target = "nbAvailable", expression = "java(Math.toIntExact(book.getCopies().stream().filter(copy -> copy.getLoan() == null).count()))")
-    })
+    @Mapping(target = "nbCopy", expression = "java(book.getCopies().size())")
+    @Mapping(target = "nbAvailable", expression = "java(Math.toIntExact(book.getCopies().stream().filter(copy -> copy.getLoan() == null).count()))")
+    @Mapping(target = "nbRequested", expression = "java(book.getRequests().size())")
+    @Mapping(target = "resquestable", ignore = true)
+    @Mapping(target = "nextReturnDate", ignore = true)
     BookStockDto bookToBookStockDto(Book book);
 }

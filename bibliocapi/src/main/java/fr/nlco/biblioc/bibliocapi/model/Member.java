@@ -1,6 +1,7 @@
 package fr.nlco.biblioc.bibliocapi.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Member implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,6 @@ public class Member implements Serializable {
     @OneToMany(mappedBy = "member")
     private List<Loan> loans;
 
-    public Member() {
-    }
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Request> requests;
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr" layout:decorate="~{layout.html}" xmlns="http://www.w3.org/1999/html"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Réservations</title>
+    <link href="/webjars/bootstrap-table/1.15.5/bootstrap-table.css" rel="stylesheet">
+</head>
+<body>
+<main class="container-fluid w-75" layout:fragment="content">
+    <div class="h2 mt-5 border-bottom">Réservations en cours</div>
+    <table data-classes="table table-striped table-hover" data-locale="fr-FR" data-search="true"
+           data-sort-name="dueDate" data-sort-order="desc" data-toggle="table">
+        <thead>
+        <tr>
+            <th data-align="center" data-halign="center" data-sortable="true">Titre</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Auteur</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Type</th>
+            <th data-align="center" data-halign="center" data-sortable="true">Position fil d'attente</th>
+            <th data-align="center" data-field="dueDate" data-halign="center" data-sortable="true">Date de retour</th>
+            <th data-align="center" data-halign="center"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${requests}">
+            <td th:utext="*{request.title}"></td>
+            <td th:utext="*{request.author}"></td>
+            <td th:utext="*{request.type}"></td>
+            <td th:utext="*{request.rank}"></td>
+            <td>
+                <div th:switch="*{request.alertDate != null && request.rank == 1}">
+                    <div th:case="true">
+                        <div th:utext="*{'A récuperer'}"></div>
+                    </div>
+                    <div th:case="false">
+                        <div th:if="*{request.returnFirstDate != null}" th:utext="*{#dates.format(request.returnFirstDate,'dd/MM/yyyy')}"></div>
+                        <div th:if="*{request.returnFirstDate == null && request.rank > 1}" th:utext="${'dans 1 ou 2 mois'}"></div>
+                    </div>
+                </div>
+            </td>
+            <td><a class="btn btn-dark rounded" role="button" th:href="@{'/request/' + ${request.requestId} + '/annulation'}">Annuler</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>

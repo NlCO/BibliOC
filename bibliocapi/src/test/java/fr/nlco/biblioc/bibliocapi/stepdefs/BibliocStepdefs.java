@@ -1,11 +1,12 @@
 package fr.nlco.biblioc.bibliocapi.stepdefs;
 
-import fr.nlco.biblioc.bibliocapi.BibliocapiApplication;
 import fr.nlco.biblioc.bibliocapi.controller.BookController;
 import fr.nlco.biblioc.bibliocapi.controller.LoanController;
 import fr.nlco.biblioc.bibliocapi.dto.BookStockDto;
+import fr.nlco.biblioc.bibliocapi.dto.LoanDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLateLoansDto;
 import fr.nlco.biblioc.bibliocapi.dto.MemberLoansDto;
+import fr.nlco.biblioc.bibliocapi.model.Copy;
 import fr.nlco.biblioc.bibliocapi.model.Loan;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import fr.nlco.biblioc.bibliocapi.repository.BookRepository;
@@ -17,32 +18,27 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.security.InvalidParameterException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = BibliocapiApplication.class, loader = SpringBootContextLoader.class)
-@ActiveProfiles("test")
 public class BibliocStepdefs {
 
     @Autowired
-    private BookRepository _BookRepository;
+    private BookRepository bookRepository;
     @Autowired
-    private CopyRepository _CopyRepository;
+    private CopyRepository copyRepository;
     @Autowired
-    private BookController _BookController;
+    private BookController bookController;
     @Autowired
-    private MemberRepository _MemberRepository;
+    private MemberRepository memberRepository;
     @Autowired
-    private LoanController _LoanController;
+    private LoanController loanController;
     @Autowired
-    private LoanRepository _LoanRepository;
+    private LoanRepository loanRepository;
 
     private Integer bookNumber = 0;
     private Integer copyNumber = 0;
@@ -57,77 +53,119 @@ public class BibliocStepdefs {
 
     private ResponseEntity<List<MemberLateLoansDto>> responseEntityMemberlateloans;
 
-    @Given("a library with n copies of y books")
-    public void aLibraryWithBooksFromYWorks() {
-        copyNumber = _CopyRepository.findAll().size();
-        bookNumber = _BookRepository.findAll().size();
+    private ResponseEntity<Void> createLoanResponse;
+
+    @Given("Une bibliothèque disposant de plusieurs exemplaires de X ouvrages")
+    public void uneBibliothqueDisposantDePlusieursExemplairesDeXOuvrages() {
+        copyNumber = copyRepository.findAll().size();
+        bookNumber = bookRepository.findAll().size();
         Assert.assertTrue("La base de données ne contient pas d'ouvrages", bookNumber > 0);
         Assert.assertTrue("La base de données ne contient pas de livres", copyNumber > 0);
     }
 
-    @When("I ask the list of books")
-    public void iAskTheListOfBooks() {
-        booksStocks = _BookController.getBooksStock();
+    @When("Le membre {} demande la liste des ouvrages")
+    public void leMembreDemandeLaListeDesOuvrages(String memberNumber) {
+        booksStocks = bookController.getBooksStock(memberNumber);
     }
 
-    @Then("a list of y books with their availability is returned")
-    public void aListOfBooksWithTheirAvailabilityIsReturned() {
+    @Then("La liste des X ouvrages avec leur disponibilté est retournée")
+    public void laListeDesXOuvragesAvecLeurDisponibilteEstRetournee() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), booksStocks.getStatusCode());
-        Integer nbBookResult = booksStocks.getBody().size();
+        List<BookStockDto> bookStocks = booksStocks.getBody();
+        Assert.assertNotNull(bookStocks);
+        Integer nbBookResult = bookStocks.size();
         Assert.assertEquals(bookNumber, nbBookResult);
-        Integer nbCopyResult = booksStocks.getBody().stream().mapToInt(BookStockDto::getNbCopy).sum();
+        Integer nbCopyResult = bookStocks.stream().mapToInt(BookStockDto::getNbCopy).sum();
         Assert.assertEquals(copyNumber, nbCopyResult);
     }
 
-    @Given("the member {} with loaned books")
-    public void aMemberWithLoanedBooks(String memberNumber) {
-        member = _MemberRepository.findByMemberNumber(memberNumber).orElseThrow(() -> new InvalidParameterException("numéro de membre inexistant"));
-        Assert.assertTrue(member.getLoans().size() > 0);
+    @Given("un membre {} avec au moins un prêt")
+    public void unMembreAvecAuMoinsUnPret(String memberNumber) {
+        member = memberRepository.findByMemberNumber(memberNumber).orElseThrow(() -> new InvalidParameterException("numéro de membre inexistant"));
+        Assert.assertFalse(member.getLoans().isEmpty());
     }
 
-    @When("he consult his loans")
-    public void heConsultHisLoaning() {
-        memberLoans = _LoanController.getMemberLoans(member.getMemberNumber());
+    @When("le membre consulte la liste de ses prêts")
+    public void leMembreConsulteLaListeDeSesPrets() {
+        memberLoans = loanController.getMemberLoans(member.getMemberNumber());
     }
 
-    @Then("a list of his loaned book is returned")
-    public void aListOfHisLoanedBookIsReturned() {
+    @Then("la liste de ses prêts est obtenue")
+    public void laListeDeSesPretEstObtenue() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), memberLoans.getStatusCode());
+        Assert.assertNotNull(memberLoans.getBody());
         Assert.assertEquals(member.getLoans().size(), memberLoans.getBody().size());
     }
 
-    @Given("a loaned book which due date is not extended")
-    public void aLoanedBookWhichDueDateIsNotExtended() {
-        loan = _LoanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
+    @Given("un prêt non expiré et non prolongé")
+    public void unPretNonExpireEtNonProlonge() {
+        loan = loanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
         Assert.assertFalse(loan.isExtendedLoan());
     }
 
-    @When("the loan period is extended")
-    public void theLoanPeriodIsExtended() {
-        extendLoanResponse = _LoanController.extendLoanPeriod(loan.getLoanId());
+    @When("une demande de prolonagation est demandée")
+    public void uneDemandeDeProlonagationEstDemandee() {
+        extendLoanResponse = loanController.extendLoanPeriod(loan.getLoanId());
     }
 
-    @Then("the book is flagged with the extend loaning period")
-    public void theBookIsFlaggedWithTheExtendLoaningPeriod() {
+    @Then("le prêt est marqué comme prolongé")
+    public void lePretEstMarqueCommeProlonge() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), extendLoanResponse.getStatusCode());
-        loan = _LoanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid"));
+        loan = loanRepository.findById(2).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
         Assert.assertTrue(loan.isExtendedLoan());
     }
 
-    @Given("a list of {int} members in the database")
-    public void membersWhichHaveLateLoans(int members) {
-        List<Member> allMembers = _MemberRepository.findAll();
-        Assert.assertEquals(members, allMembers.size());
+    @Given("un prêt en retard et non prolongé")
+    public void unPretEnRetardEtNonProlonge() {
+        loan = loanRepository.findById(1).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
+        LocalDate today = LocalDate.now();
+        Assert.assertTrue(today.minusWeeks(4).isAfter(loan.getLoanDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+        Assert.assertFalse(loan.isExtendedLoan());
     }
 
-    @When("the batch look for late loans of member")
-    public void theBatchLookForLateLoansOfMember() {
-        responseEntityMemberlateloans = _LoanController.getLateLoans();
+    @Then("le prêt reste marqué comme non prolongé")
+    public void lePretResteMarqueCommeNonProlonge() {
+        Assert.assertEquals(ResponseEntity.status(400).build().getStatusCode(), extendLoanResponse.getStatusCode());
+        loan = loanRepository.findById(1).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
+        Assert.assertFalse(loan.isExtendedLoan());
     }
 
-    @Then("a list of {int} member is return")
-    public void aListOfMemberIsReturn(int memberwithlateloan) {
+    @Given("une base avec au moins un utilisateur ayant un prêt en retard")
+    public void uneBaseAvecAuMoinsUnUtilisateurAyantUnPretEnRetard() {
+        List<Member> allMembers = memberRepository.findAll();
+        LocalDate today = LocalDate.now();
+        Assert.assertTrue(allMembers.stream().filter(m -> !m.getLoans().isEmpty())
+                .anyMatch(m -> m.getLoans().stream().anyMatch(l -> today.minusWeeks(4).isAfter(l.getLoanDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()))));
+    }
+
+    @When("on interroge la liste des prêts en retard")
+    public void onInterrogeLaListeDesPresEnRetard() {
+        responseEntityMemberlateloans = loanController.getLateLoans();
+    }
+
+    @Then("une liste contenant les membres est retournée")
+    public void uneListeContenantLesMembresEstRetournee() {
         Assert.assertEquals(ResponseEntity.ok().build().getStatusCode(), responseEntityMemberlateloans.getStatusCode());
-        Assert.assertEquals(memberwithlateloan, responseEntityMemberlateloans.getBody().size());
+        Assert.assertNotNull(responseEntityMemberlateloans.getBody());
+        Assert.assertFalse(responseEntityMemberlateloans.getBody().isEmpty());
+    }
+
+    @Given("l'exemplaire d'id {int} deja réservé")
+    public void lExemplaireDejaReerve(int copyId) {
+        Copy copy = copyRepository.findById(copyId).orElseThrow(() -> new InvalidParameterException("Id d'emprunt invalid - vérifier le jeu de test"));
+        Assert.assertNotNull(copy.getLoan());
+    }
+
+    @When("le membre {} demande le pret de l'exemplaire d'id {int} tout de même")
+    public void leMembreDemandeLePretDeLExemplaireToutDeMeme(String mumberNumber, int copyId) {
+        LoanDto loanDto = new LoanDto();
+        loanDto.setCopyId(copyId);
+        loanDto.setMemberNumber(mumberNumber);
+        createLoanResponse = loanController.createLoan(loanDto);
+    }
+
+    @Then("le prêt de l'exemplaire est refusé")
+    public void lePretDeLExmplaireEstRefuse() {
+        Assert.assertEquals(ResponseEntity.badRequest().build().getStatusCode(), createLoanResponse.getStatusCode());
     }
 }

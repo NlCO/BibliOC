@@ -1,6 +1,7 @@
 package fr.nlco.biblioc.bibliocbatch.configuration;
 
 import fr.nlco.biblioc.bibliocbatch.steps.MembersLateLoansTasklet;
+import fr.nlco.biblioc.bibliocbatch.steps.RefreshBooksRequestsTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -22,13 +23,18 @@ public class BatchConfig {
 
     public final StepBuilderFactory steps;
 
-    public final MembersLateLoansTasklet task;
+    public final MembersLateLoansTasklet task1;
+
+    public final RefreshBooksRequestsTasklet task2;
 
     @Autowired
-    public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, MembersLateLoansTasklet membersLateLoansTasklet) {
+    public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                       MembersLateLoansTasklet membersLateLoansTasklet,
+                       RefreshBooksRequestsTasklet refreshBooksRequestTask) {
         this.jobs = jobBuilderFactory;
         this.steps = stepBuilderFactory;
-        this.task = membersLateLoansTasklet;
+        this.task1 = membersLateLoansTasklet;
+        this.task2 = refreshBooksRequestTask;
     }
 
     /**
@@ -37,10 +43,12 @@ public class BatchConfig {
      * @return un job
      */
     @Bean
-    public Job sendReminderJob() {
-        return jobs.get("sendReminderJob")
+    public Job dailyJob() {
+        return jobs.get("dailyJob")
                 .incrementer(new RunIdIncrementer())
-                .start(stepOne()).build();
+                .start(stepOne())
+                .start(stepTwo())
+                .build();
     }
 
     /**
@@ -50,8 +58,17 @@ public class BatchConfig {
      */
     @Bean
     public Step stepOne() {
-        return steps.get("stepOne").tasklet(task).build();
+        return steps.get("stepOne").tasklet(task1).build();
     }
 
+    /**
+     * Déclaration d'une step
+     *
+     * @return une step
+     */
+    @Bean
+    public Step stepTwo() {
+        return steps.get("stepTwo").tasklet(task2).build();
+    }
 
 }
