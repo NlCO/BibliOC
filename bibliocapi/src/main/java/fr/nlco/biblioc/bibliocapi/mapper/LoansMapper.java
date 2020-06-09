@@ -6,6 +6,7 @@ import fr.nlco.biblioc.bibliocapi.model.Loan;
 import fr.nlco.biblioc.bibliocapi.model.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 import java.util.List;
 
@@ -29,19 +30,23 @@ public interface LoansMapper {
      * @param loan prêt
      * @return prêt formaté
      */
-    @Mapping(target = "loanId", expression = "java(loan.getLoanId())")
-    @Mapping(target = "title", expression = "java(loan.getCopy().getBook().getTitle())")
-    @Mapping(target = "author", expression = "java(loan.getCopy().getBook().getAuthor())")
-    @Mapping(target = "type", expression = "java(loan.getCopy().getBook().getType())")
-    @Mapping(target = "dueDate", ignore = true)
-    @Mapping(target = "library", expression = "java(loan.getCopy().getLocation().getLibName())")
+    @Mappings({
+            @Mapping(target = "loanId", expression = "java(loan.getLoanId())"),
+            @Mapping(target = "title", expression = "java(loan.getCopy().getBook().getTitle())"),
+            @Mapping(target = "author", expression = "java(loan.getCopy().getBook().getAuthor())"),
+            @Mapping(target = "type", expression = "java(loan.getCopy().getBook().getType())"),
+            @Mapping(target = "dueDate", ignore = true),
+            @Mapping(target = "library", expression = "java(loan.getCopy().getLocation().getLibName())")
+    })
     MemberLoansDto loanToMemberLoanDto(Loan loan);
 
     /**
      * Mapper pour convertir un prêt en retard vers sa forme DTO
      */
-    @Mapping(target = "memberNumber", source = "member.memberNumber")
-    @Mapping(target = "email", source = "member.email")
-    @Mapping(target = "lateLoanList", source = "lateLoans")
+    @Mappings({
+            @Mapping(target = "memberNumber", source = "member.memberNumber"),
+            @Mapping(target = "email", source = "member.email"),
+            @Mapping(target = "lateLoanList", source = "lateLoans")
+    })
     MemberLateLoansDto memberLateLoansToMemberLateLoansDto(Member member, List<MemberLoansDto> lateLoans);
 }

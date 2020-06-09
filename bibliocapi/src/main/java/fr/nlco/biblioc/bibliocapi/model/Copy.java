@@ -1,7 +1,6 @@
 package fr.nlco.biblioc.bibliocapi.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,7 +12,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 public class Copy implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +25,7 @@ public class Copy implements Serializable {
 
     @OneToOne(mappedBy = "copy")
     private Loan loan;
+
+    public Copy() {
+    }
 }

@@ -137,7 +137,7 @@ public class LoanServiceImpl implements LoanService {
      * @param extendedLoan prolongation de prêt (booléen)
      * @return date de retour du prêt
      */
-    private Date computeDueDate(Date loanDate, boolean extendedLoan) {
+    private Date computeDueDate(Date loanDate, Boolean extendedLoan) {
         Calendar c = Calendar.getInstance();
         c.setTime(loanDate);
         c.add(Calendar.WEEK_OF_MONTH, 4 * (extendedLoan ? 2 : 1));
