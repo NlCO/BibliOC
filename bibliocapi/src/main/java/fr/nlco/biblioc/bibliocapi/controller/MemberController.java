@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberService _MemberService;
 
     @Autowired
     public MemberController(MemberService memberService) {
-        this.memberService = memberService;
+        this._MemberService = memberService;
     }
 
     /**
@@ -29,7 +29,7 @@ public class MemberController {
      */
     @GetMapping("member/{memberNumber}")
     public ResponseEntity<MemberCredDto> getMemberCred(@PathVariable("memberNumber") String memberNumber) {
-        MemberCredDto memberCredDto = memberService.getMemberCred(memberNumber);
+        MemberCredDto memberCredDto = _MemberService.getMemberCred(memberNumber);
         if (memberCredDto == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(memberCredDto);
     }

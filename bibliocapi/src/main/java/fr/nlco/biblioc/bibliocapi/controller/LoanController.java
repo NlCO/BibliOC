@@ -19,11 +19,11 @@ import java.util.List;
 @RestController
 public class LoanController {
 
-    private LoanService loanService;
+    private LoanService _LoanService;
 
     @Autowired
     public LoanController(LoanService loanService) {
-        this.loanService = loanService;
+        this._LoanService = loanService;
     }
 
     /**
@@ -34,7 +34,7 @@ public class LoanController {
      */
     @GetMapping("/loan/{memberNumber}")
     public ResponseEntity<List<MemberLoansDto>> getMemberLoans(@PathVariable String memberNumber) {
-        List<MemberLoansDto> memberLoans = loanService.getMemberLoans(memberNumber);
+        List<MemberLoansDto> memberLoans = _LoanService.getMemberLoans(memberNumber);
         if (memberLoans == null) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(memberLoans);
     }
@@ -47,7 +47,7 @@ public class LoanController {
      */
     @PutMapping("/loan/{loanId}/extend")
     public ResponseEntity<Loan> extendLoanPeriod(@PathVariable("loanId") Integer loanId) {
-        Loan updatedLoan = loanService.extendLoanPeriod(loanId);
+        Loan updatedLoan = _LoanService.extendLoanPeriod(loanId);
         if (updatedLoan == null) return ResponseEntity.status(400).build();
         return ResponseEntity.ok().build();
     }
@@ -57,7 +57,7 @@ public class LoanController {
      */
     @GetMapping("/loan/late")
     public ResponseEntity<List<MemberLateLoansDto>> getLateLoans() {
-        List<MemberLateLoansDto> lateLoans = loanService.getLateLoans();
+        List<MemberLateLoansDto> lateLoans = _LoanService.getLateLoans();
         if (lateLoans == null) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(lateLoans);
     }
@@ -70,7 +70,7 @@ public class LoanController {
      */
     @PostMapping("/loan")
     public ResponseEntity<Void> createLoan(@RequestBody LoanDto loanToCreate) {
-        Loan loan = loanService.createLoan(loanToCreate);
+        Loan loan = _LoanService.createLoan(loanToCreate);
         if (loan == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -91,7 +91,7 @@ public class LoanController {
     @DeleteMapping("/loan/{loanId}/return")
     public ResponseEntity<Void> returnLoan(@PathVariable("loanId") Integer loanId) {
         try {
-            loanService.returnLoan(loanId);
+            _LoanService.returnLoan(loanId);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
