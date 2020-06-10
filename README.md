@@ -24,19 +24,23 @@ Ajout d'un fonctionnalite de réservation des ouvrages (https://github.com/NlCO/
 Chaque module est indépendant et dispose de sa propre configuration (se référer à leur readme pour plus d'information).
 
 Cependant les modules front (bibliocweb) et batch (bibliocbatch) necessitent que le module API (bibliocapi) soit actif.
-De plus, le module batch necessite aussi qu'un serveur SMTP soit parametré. La configuration du serveur SMTP doit être renseignée dans le fichier src\resources\application.properties du module bibliocbatch.
+De plus, les modules API et batch necessitent qu'un serveur SMTP soit parametré. La configuration du serveur SMTP doit être renseignée dans les fichiers src\resources\application.properties du module correspondant.
 Le repo est configuré pour l'utilisation d'un serveur SMTP local fakeSMTP (http://nilhcem.com/FakeSMTP/)
 
 L'application est configurée par défaut pour packager : 
 le module API sur l'adresse http://localhost:8088/ avec une base de données "in-Memory" (H2)
 le module front sur l'adresse http://localhost:8080/
-le module batch utilise le serveur SMTP local.
+les modules API et batch utilisent le serveur SMTP local (fourni dans le repo dans le dossier fakeSMTP).
   
 2.Déploiement
 
   * création des packages via la commande à la racine du repository :
   
         mvn clean package
+
+  * lancement du serveur SMTP (ici fakSMTP)
+    
+        java -jar ..\-jar fakeSMTP\fakeSMTP-2.0.jar -s
     
   * lancement de l'API
     
@@ -62,8 +66,6 @@ L'API est exposée via l'URL : http://localhost:8088/
 Une documentation swagger de l'API est disponible à l'adresse : http://localhost:8088/swagger-ui.html
 
 
-  * Utilisation du batch de relance
-
-Après avoir démarrer le serveur SMTP, lancer la ligne de commande :
+  * Utilisation du batch de relance et refresh des réservations
    
-    java -jar bibliocbatch\target\bibliocbatch-1.1.0.jar
+        java -jar bibliocbatch\target\bibliocbatch-1.1.0.jar
