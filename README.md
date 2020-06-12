@@ -38,9 +38,9 @@ les modules API et batch utilisent le serveur SMTP local (fourni dans le repo da
   
         mvn clean package
 
-  * lancement du serveur SMTP (ici fakSMTP)
+  * lancement du serveur SMTP (ici fakeSMTP)
     
-        java -jar ..\-jar fakeSMTP\fakeSMTP-2.0.jar -s
+        java -jar fakeSMTP\fakeSMTP-2.0.jar -s
     
   * lancement de l'API
     
